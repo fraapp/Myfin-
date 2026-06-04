@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DocFiscal">
+<title>DocFiscal — Récapitulatif Fiscal</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --navy: #0f1f3d;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #faf7f2;
+    --white: #ffffff;
+    --gray: #8a9ab5;
+    --light: #f0eff4;
+    --green: #2d7a4f;
+    --red: #b03a2e;
+    --shadow: 0 4px 24px rgba(15,31,61,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--navy);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 20px 20px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.02em;
+  }
+  header p {
+    font-size: 0.75rem;
+    color: var(--gold-light);
+    margin-top: 2px;
+  }
+  .header-date {
+    font-size: 0.72rem;
+    color: var(--gray);
+    margin-top: 4px;
+  }
+
+  /* NAV TABS */
+  nav {
+    display: flex;
+    background: white;
+    border-bottom: 2px solid var(--light);
+    position: sticky;
+    top: 72px;
+    z-index: 99;
+  }
+  nav button {
+    flex: 1;
+    padding: 12px 4px;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--gray);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+  }
+  nav button.active {
+    color: var(--navy);
+    border-bottom-color: var(--gold);
+  }
+
+  /* SECTIONS */
+  .section { display: none; padding: 16px; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem;
+    color: var(--navy);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-title span.badge {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.68rem;
+    background: var(--gold);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  /* BOUTONS SCANNER / TELECHARGER */
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .btn-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 18px 10px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-action:active { transform: scale(0.96); }
+  .btn-scan {
+    background: var(--navy);
+    color: white;
+    box-shadow: 0 4px 16px rgba(15,31,61,0.25);
+  }
+  .btn-upload {
+    background: var(--gold);
+    color: white;
+    box-shadow: 0 4px 16px rgba(201,168,76,0.35);
+  }
+  .btn-icon { font-size: 1.6rem; }
+
+  /* FORMULAIRE AJOUT */
+  .form-group { margin-bottom: 12px; }
+  .form-group label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--gray);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--light);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--navy);
+    background: white;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--navy);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.2s;
+  }
+  .btn-primary:active { background: #1a3460; }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background: var(--light);
+    color: var(--navy);
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  /* LISTE DOCUMENTS */
+  .doc-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--light);
+  }
+  .doc-item:last-child { border-bottom: none; }
+  .doc-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .doc-info { flex: 1; min-width: 0; }
+  .doc-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .doc-meta {
+    font-size: 0.72rem;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+  .doc-amount {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--green);
+    white-space: nowrap;
+  }
+  .doc-delete {
+    background: none;
+    border: none;
+    color: var(--gray);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  /* RECAP */
+  .recap-header {
+    background: var(--navy);
+    color: white;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .recap-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
+  .recap-header .total-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: -0.02em;
+  }
+  .recap-header .total-label {
+    font-size: 0.72rem;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+
+  .recap-category {
+    background: white;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .recap-cat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 16px;
+    cursor: pointer;
+    background: white;
+  }
+  .recap-cat-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .recap-cat-count {
+    font-size: 0.7rem;
+    color: var(--gray);
+    background: var(--light);
+    padding: 2px 7px;
+    border-radius: 10px;
+  }
+  .recap-cat-total {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--green);
+  }
+  .recap-cat-items {
+    border-top: 1px solid var(--light);
+    display: none;
+  }
+  .recap-cat-items.open { display: block; }
+  .recap-item-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 16px;
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--light);
+  }
+  .recap-item-row:last-child { border-bottom: none; }
+  .recap-item-label { color: var(--navy); }
+  .recap-item-amount { font-weight: 600; color: var(--green); }
+
+  /* BOUTON EXPORT */
+  .btn-export {
+    width: 100%;
+    padding: 16px;
+    background: var(--gold);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 16px rgba(201,168,76,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* IMAGE PREVIEW */
+  .img-preview {
+    width: 100%;
+    border-radius: 10px;
+    max-height: 200px;
+    object-fit: cover;
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--navy);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--gray);
+  }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+  .empty p { font-size: 0.85rem; }
+
+  /* NOUVELLE CATEGORIE */
+  .new-cat-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .new-cat-row input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1.5px dashed var(--gold);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    background: #fffdf6;
+  }
+  .new-cat-row button {
+    padding: 10px 14px;
+    background: var(--gold);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  input[type="file"] { display: none; }
+
+  @media print {
+    nav, .btn-row, .btn-export, .btn-primary, .btn-secondary { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 DocFiscal</h1>
+  <p>Récapitulatif Documents Fiscaux</p>
+  <div class="header-date" id="headerDate"></div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('scanner')">📷 Scanner</button>
+  <button onclick="showTab('documents')">📁 Documents</button>
+  <button onclick="showTab('recap')">📊 Récap</button>
+</nav>
+
+<!-- TAB SCANNER -->
+<div id="tab-scanner" class="section active">
+
+  <div class="btn-row">
+    <button class="btn-action btn-scan" onclick="document.getElementById('cameraInput').click()">
+      <span class="btn-icon">📷</span>
+      Scanner
+    </button>
+    <button class="btn-action btn-upload" onclick="document.getElementById('fileInput').click()">
+      <span class="btn-icon">📎</span>
+      Télécharger
+    </button>
+  </div>
+
+  <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleCapture(event)">
+  <input type="file" id="fileInput" accept="image/*,application/pdf,.pdf" onchange="handleCapture(event)">
+
+  <div class="card">
+    <div class="card-title">Encoder le document</div>
+
+    <img id="imgPreview" class="img-preview" alt="Aperçu">
+
+    <div class="form-group">
+      <label>Catégorie</label>
+      <select id="catSelect" onchange="checkNewCat()">
+        <option value="">— Choisir —</option>
+        <option value="FI">FI — Fiches</option>
+        <option value="FR">FR — Frais Réels (hors récep./carbur.)</option>
+        <option value="FR M/C">FR M/C — Missions, Réceptions & Carburant</option>
+        <option value="A">A — Assurances</option>
+        <option value="NEW">➕ Nouvelle catégorie...</option>
+      </select>
+    </div>
+
+    <div id="newCatZone" style="display:none" class="form-group">
+      <label>Nom de la nouvelle catégorie</label>
+      <div class="new-cat-row">
+        <input type="text" id="newCatInput" placeholder="Ex: B — Banque...">
+        <button onclick="addNewCategory()">✓</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Référence / Description</label>
+      <input type="text" id="docRef" placeholder="Ex: FR1 / DKV 291178291">
+    </div>
+
+    <div class="form-group">
+      <label>Montant (€)</label>
+      <input type="number" id="docAmount" placeholder="0,00" step="0.01" min="0">
+    </div>
+
+    <div class="form-group">
+      <label>Date du document</label>
+      <input type="date" id="docDate">
+    </div>
+
+    <div class="form-group">
+      <label>Annexe / Note</label>
+      <input type="text" id="docNote" placeholder="Ex: Annexe revenus, N° de police...">
+    </div>
+
+    <button class="btn-primary" onclick="saveDocument()">✓ Enregistrer le document</button>
+  </div>
+</div>
+
+<!-- TAB DOCUMENTS -->
+<div id="tab-documents" class="section">
+  <div class="card">
+    <div class="card-title">
+      Documents encodés
+      <span class="badge" id="docCount">0</span>
+    </div>
+    <div id="docList">
+      <div class="empty">
+        <div class="empty-icon">📂</div>
+        <p>Aucun document encodé.<br>Utilisez l'onglet Scanner pour commencer.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB RECAP -->
+<div id="tab-recap" class="section">
+  <div class="recap-header">
+    <h2>FRANCOIS SELVAIT</h2>
+    <div style="font-size:0.72rem; color:var(--gold-light); margin-bottom:8px" id="recapYear">RÉCAPITULATIF DOCUMENTS FISCAUX</div>
+    <div class="total-amount" id="recapTotal">0,00 €</div>
+    <div class="total-label">TOTAL GÉNÉRAL</div>
+    <div style="font-size:0.7rem; color:var(--gray); margin-top:6px" id="recapDate"></div>
+  </div>
+
+  <button class="btn-export" onclick="exportPDF()">
+    📄 Exporter en PDF
+  </button>
+
+  <div id="recapContent">
+    <div class="empty">
+      <div class="empty-icon">📊</div>
+      <p>Aucun document encodé.<br>Le récapitulatif apparaîtra ici.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────
+let documents = [];
+let categories = [
+  { code: 'FI', label: 'Fiches', color: '#2d7a4f' },
+  { code: 'FR', label: 'Frais Réels (hors récep./carbur.)', color: '#1a5fa8' },
+  { code: 'FR M/C', label: 'Missions, Réceptions & Carburant', color: '#7b4fa8' },
+  { code: 'A', label: 'Assurances', color: '#c9a84c' },
+];
+let currentImageData = null;
+
+// ─── INIT ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  document.getElementById('headerDate').textContent =
+    now.toLocaleDateString('fr-BE', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('docDate').value = now.toISOString().split('T')[0];
+  document.getElementById('recapDate').textContent =
+    'Généré le ' + now.toLocaleDateString('fr-BE', { day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('recapYear').textContent =
+    'RÉCAPITULATIF DOCUMENTS FISCAUX R-' + now.getFullYear();
+  renderAll();
+});
+
+// ─── TABS ─────────────────────────────────────────────
+function showTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (tab === 'recap') renderRecap();
+  if (tab === 'documents') renderDocList();
+}
+
+// ─── CAPTURE ──────────────────────────────────────────
+function handleCapture(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      currentImageData = ev.target.result;
+      const img = document.getElementById('imgPreview');
+      img.src = currentImageData;
+      img.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  } else {
+    currentImageData = null;
+    showToast('📎 Fichier PDF joint');
+  }
+  e.target.value = '';
+}
+
+// ─── CATÉGORIE ────────────────────────────────────────
+function checkNewCat() {
+  const val = document.getElementById('catSelect').value;
+  document.getElementById('newCatZone').style.display = val === 'NEW' ? 'block' : 'none';
+}
+
+function addNewCategory() {
+  const input = document.getElementById('newCatInput');
+  const raw = input.value.trim();
+  if (!raw) return;
+  const parts = raw.split('—');
+  const code = parts[0].trim();
+  const label = parts[1] ? parts[1].trim() : code;
+  const colors = ['#e07b39','#2d9c8a','#b03a2e','#5a6fa8','#8b5fa8'];
+  const color = colors[categories.length % colors.length];
+  categories.push({ code, label, color });
+  const sel = document.getElementById('catSelect');
+  const opt = new Option(`${code} — ${label}`, code);
+  sel.insertBefore(opt, sel.lastElementChild);
+  sel.value = code;
+  document.getElementById('newCatZone').style.display = 'none';
+  input.value = '';
+  showToast('✅ Catégorie ajoutée : ' + code);
+}
+
+// ─── SAUVEGARDER ──────────────────────────────────────
+function saveDocument() {
+  const cat = document.getElementById('catSelect').value;
+  const ref = document.getElementById('docRef').value.trim();
+  const amount = parseFloat(document.getElementById('docAmount').value);
+  const date = document.getElementById('docDate').value;
+  const note = document.getElementById('docNote').value.trim();
+
+  if (!cat || cat === 'NEW') { showToast('⚠️ Choisissez une catégorie'); return; }
+  if (!ref) { showToast('⚠️ Ajoutez une référence'); return; }
+  if (isNaN(amount) || amount <= 0) { showToast('⚠️ Montant invalide'); return; }
+
+  const doc = {
+    id: Date.now(),
+    cat, ref, amount, date, note,
+    image: currentImageData,
+    addedAt: new Date().toISOString()
+  };
+  documents.push(doc);
+  currentImageData = null;
+
+  // Reset form
+  document.getElementById('catSelect').value = '';
+  document.getElementById('docRef').value = '';
+  document.getElementById('docAmount').value = '';
+  document.getElementById('docNote').value = '';
+  document.getElementById('imgPreview').style.display = 'none';
+  document.getElementById('imgPreview').src = '';
+  document.getElementById('docDate').value = new Date().toISOString().split('T')[0];
+
+  renderAll();
+  showToast('✅ Document enregistré');
+}
+
+// ─── SUPPRIMER ────────────────────────────────────────
+function deleteDoc(id) {
+  documents = documents.filter(d => d.id !== id);
+  renderAll();
+  showToast('🗑 Document supprimé');
+}
+
+// ─── RENDER LISTE ─────────────────────────────────────
+function renderDocList() {
+  const list = document.getElementById('docList');
+  document.getElementById('docCount').textContent = documents.length;
+  if (!documents.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">📂</div><p>Aucun document encodé.</p></div>`;
+    return;
+  }
+  list.innerHTML = [...documents].reverse().map(d => {
+    const cat = categories.find(c => c.code === d.cat) || { color: '#888' };
+    const dateStr = d.date ? new Date(d.date).toLocaleDateString('fr-BE') : '';
+    return `
+    <div class="doc-item">
+      <div class="doc-icon" style="background:${cat.color}22">
+        <span style="font-size:1.2rem">${getCatIcon(d.cat)}</span>
+      </div>
+      <div class="doc-info">
+        <div class="doc-name">${d.ref}</div>
+        <div class="doc-meta">${d.cat} · ${dateStr}${d.note ? ' · ' + d.note : ''}</div>
+      </div>
+      <div class="doc-amount">+${formatAmount(d.amount)}</div>
+      <button class="doc-delete" onclick="deleteDoc(${d.id})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ─── RENDER RECAP ─────────────────────────────────────
+function renderRecap() {
+  const content = document.getElementById('recapContent');
+  if (!documents.length) {
+    content.innerHTML = `<div class="empty"><div class="empty-icon">📊</div><p>Aucun document encodé.</p></div>`;
+    document.getElementById('recapTotal').textContent = '0,00 €';
+    return;
+  }
+
+  // Group by category
+  const grouped = {};
+  documents.forEach(d => {
+    if (!grouped[d.cat]) grouped[d.cat] = [];
+    grouped[d.cat].push(d);
+  });
+
+  let totalGlobal = 0;
+  let html = '';
+
+  // Order by defined categories first
+  const orderedCats = [...categories.map(c => c.code), ...Object.keys(grouped).filter(k => !categories.find(c => c.code === k))];
+  const seen = new Set();
+
+  orderedCats.forEach(code => {
+    if (seen.has(code) || !grouped[code]) return;
+    seen.add(code);
+    const items = grouped[code];
+    const catDef = categories.find(c => c.code === code);
+    const catLabel = catDef ? catDef.label : code;
+    const catColor = catDef ? catDef.color : '#888';
+    const catTotal = items.reduce((s, d) => s + d.amount, 0);
+    totalGlobal += catTotal;
+
+    html += `
+    <div class="recap-category">
+      <div class="recap-cat-header" onclick="toggleCat('cat-${code.replace(/[^a-z0-9]/gi,'_')}')">
+        <div class="recap-cat-name">
+          <span style="color:${catColor}">${getCatIcon(code)}</span>
+          <span>${code}</span>
+          <span class="recap-cat-count">${items.length} doc.</span>
+        </div>
+        <div class="recap-cat-total">+${formatAmount(catTotal)}</div>
+      </div>
+      <div class="recap-cat-items" id="cat-${code.replace(/[^a-z0-9]/gi,'_')}">
+        <div style="padding:6px 16px 4px; font-size:0.7rem; color:var(--gray); font-style:italic">${catLabel}</div>
+        ${items.map(d => `
+          <div class="recap-item-row">
+            <span class="recap-item-label">${d.ref}${d.note ? ' · <em style="color:var(--gray)">' + d.note + '</em>' : ''}</span>
+            <span class="recap-item-amount">+${formatAmount(d.amount)}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('recapTotal').textContent = formatAmount(totalGlobal) + ' €';
+  content.innerHTML = html;
+}
+
+function toggleCat(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// ─── EXPORT PDF ───────────────────────────────────────
+function exportPDF() {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fr-BE', { day:'numeric', month:'long', year:'numeric' });
+
+  const grouped = {};
+  documents.forEach(d => {
+    if (!grouped[d.cat]) grouped[d.cat] = [];
+    grouped[d.cat].push(d);
+  });
+
+  let totalGlobal = 0;
+  let rows = '';
+
+  const orderedCats = [...categories.map(c => c.code), ...Object.keys(grouped).filter(k => !categories.find(c => c.code === k))];
+  const seen = new Set();
+
+  orderedCats.forEach(code => {
+    if (seen.has(code) || !grouped[code]) return;
+    seen.add(code);
+    const items = grouped[code];
+    const catDef = categories.find(c => c.code === code);
+    const catLabel = catDef ? catDef.label : code;
+    const catTotal = items.reduce((s, d) => s + d.amount, 0);
+    totalGlobal += catTotal;
+    const pagesCount = items.length;
+
+    rows += `
+      <tr style="background:#f0f4ff">
+        <td colspan="2" style="padding:10px 12px; font-weight:700; font-size:0.9em; border-bottom:2px solid #0f1f3d; text-decoration:underline">
+          ${code} — ${catLabel.toUpperCase()} - ${pagesCount} PAGE${pagesCount>1?'S':''}
+        </td>
+        <td style="padding:10px 12px; font-weight:700; text-align:right; border-bottom:2px solid #0f1f3d; color:#2d7a4f">
+          ${formatAmount(catTotal)}
+        </td>
+      </tr>`;
+    items.forEach(d => {
+      rows += `
+        <tr>
+          <td style="padding:7px 12px; font-size:0.85em; color:#666">${d.date ? new Date(d.date).toLocaleDateString('fr-BE') : ''}</td>
+          <td style="padding:7px 12px; font-size:0.85em">- ${d.ref}${d.note ? ' · ' + d.note : ''}</td>
+          <td style="padding:7px 12px; font-size:0.85em; text-align:right; font-weight:600">+ ${formatAmount(d.amount)}</td>
+        </tr>`;
+    });
+    rows += `<tr><td colspan="3" style="padding:4px"></td></tr>`;
+  });
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; color: #0f1f3d; }
+    h1 { font-size: 1.4em; margin-bottom: 4px; }
+    .sub { font-size: 0.85em; color: #666; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    td { vertical-align: top; }
+    .total-row td { padding: 14px 12px; font-size: 1.1em; font-weight: 700; background: #0f1f3d; color: white; }
+  </style></head><body>
+  <p style="font-weight:700; margin-bottom:4px">FRANCOIS SELVAIT</p>
+  <h1>RÉCAPITULATIF DOCUMENTS FISCAUX R-${now.getFullYear()}</h1>
+  <p class="sub">Généré le ${dateStr}</p>
+  <table>
+    <tbody>
+      ${rows}
+      <tr class="total-row">
+        <td colspan="2">TOTAL GÉNÉRAL</td>
+        <td style="text-align:right; color:#e8c97a">${formatAmount(totalGlobal)} €</td>
+      </tr>
+    </tbody>
+  </table>
+  </body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(() => win.print(), 500);
+}
+
+// ─── HELPERS ──────────────────────────────────────────
+function formatAmount(n) {
+  return n.toLocaleString('fr-BE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function getCatIcon(code) {
+  const icons = { 'FI': '📋', 'FR': '🧾', 'FR M/C': '⛽', 'A': '🛡️' };
+  return icons[code] || '📄';
+}
+
+function renderAll() {
+  renderDocList();
+  renderRecap();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
