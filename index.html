@@ -1,0 +1,2820 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DocFiscal">
+<title>DocFiscal Pro</title>
+<link rel="manifest" href="manifest.json">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{--navy:#0f1f3d;--gold:#c9a84c;--gold-light:#e8c97a;--cream:#faf7f2;--gray:#8a9ab5;--light:#f0eff4;--green:#2d7a4f;--red:#b03a2e;--blue:#1a5fa8;--purple:#7b4fa8;--shadow:0 4px 24px rgba(15,31,61,0.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);min-height:100vh;padding-bottom:80px}
+header{background:var(--navy);color:white;padding:16px 20px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+header h1{font-family:'DM Serif Display',serif;font-size:1.3rem;display:flex;align-items:center;gap:8px}
+.header-sub{font-size:0.72rem;color:var(--gold-light);margin-top:2px}
+.header-dossier{font-size:0.78rem;color:var(--gold);margin-top:4px;font-weight:600}
+.ai-badge{background:var(--gold);color:white;font-size:0.6rem;font-weight:700;padding:2px 7px;border-radius:20px}
+nav{display:flex;background:white;border-bottom:2px solid var(--light);position:sticky;top:64px;z-index:99;overflow-x:auto}
+nav button{flex:1;min-width:60px;padding:10px 4px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:0.68rem;font-weight:500;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+nav button.active{color:var(--navy);border-bottom-color:var(--gold)}
+.section{display:none;padding:16px}.section.active{display:block}
+.card{background:white;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-title{font-family:'DM Serif Display',serif;font-size:1rem;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--light);display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:0.68rem;background:var(--gold);color:white;padding:2px 8px;border-radius:20px;font-weight:600}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.btn-action{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px 10px;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer;transition:transform 0.15s}
+.btn-action:active{transform:scale(0.96)}
+.btn-scan{background:var(--navy);color:white}
+.btn-upload{background:var(--gold);color:white}
+.btn-icon{font-size:1.5rem}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:0.7rem;font-weight:600;color:var(--gray);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1.5px solid var(--light);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--navy);background:white;-webkit-appearance:none}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--gold)}
+.btn-primary{width:100%;padding:13px;background:var(--navy);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;margin-top:4px}
+.btn-gold{width:100%;padding:13px;background:var(--gold);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;margin-top:8px}
+.btn-light{width:100%;padding:11px;background:var(--light);color:var(--navy);border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;margin-top:8px}
+.btn-confirm{width:100%;padding:13px;background:var(--green);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:8px}
+.btn-modify{width:100%;padding:11px;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;margin-top:6px}
+/* AI BOX */
+.ai-box{background:linear-gradient(135deg,#0f1f3d,#1a3460);border-radius:16px;padding:16px;margin-bottom:16px;color:white}
+.ai-box-title{font-size:0.75rem;color:var(--gold-light);font-weight:600;margin-bottom:12px}
+.ai-result-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.ai-result-label{font-size:0.72rem;color:var(--gray);flex-shrink:0;margin-right:8px}
+.ai-result-value{font-size:0.85rem;font-weight:600;color:white;text-align:right}
+.ai-confidence{display:inline-block;font-size:0.62rem;padding:2px 8px;border-radius:10px;font-weight:700}
+.confidence-high{background:#2d7a4f;color:white}.confidence-medium{background:#c9a84c;color:white}.confidence-low{background:#b03a2e;color:white}
+.calcul-box{background:rgba(201,168,76,0.12);border:1px solid var(--gold);border-radius:12px;padding:14px;margin-top:12px}
+.calcul-title{font-size:0.72rem;color:var(--gold-light);font-weight:700;margin-bottom:10px;text-transform:uppercase}
+.calcul-step{display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:6px}
+.calcul-step-label{color:var(--gray)}.calcul-step-value{color:white;font-weight:600}
+.calcul-final{display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid rgba(201,168,76,0.3);margin-top:6px}
+.calcul-final-label{font-size:0.85rem;font-weight:700;color:var(--gold-light)}
+.calcul-final-value{font-size:1.1rem;font-weight:700;color:var(--gold-light)}
+.coeff-zone{margin-top:10px}
+.coeff-label{font-size:0.7rem;color:var(--gray);margin-bottom:6px}
+.coeff-buttons{display:flex;gap:6px;flex-wrap:wrap}
+.coeff-btn{padding:5px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:white;font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer}
+.coeff-btn.active{background:var(--gold);border-color:var(--gold)}
+.ai-question{background:rgba(201,168,76,0.15);border:1px solid var(--gold);border-radius:10px;padding:10px;margin-top:10px;font-size:0.8rem;color:var(--gold-light)}
+.analyzing{text-align:center;padding:24px}
+.analyzing-spinner{font-size:2rem;animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.analyzing p{font-size:0.8rem;color:var(--gray);margin-top:8px}
+.img-preview{width:100%;border-radius:10px;max-height:160px;object-fit:cover;margin-bottom:12px;display:none}
+/* DOSSIERS */
+.dossier-item{display:flex;align-items:center;justify-content:space-between;padding:14px;background:white;border-radius:12px;margin-bottom:10px;box-shadow:var(--shadow);cursor:pointer}
+.dossier-info h3{font-family:'DM Serif Display',serif;font-size:0.95rem}
+.dossier-info p{font-size:0.72rem;color:var(--gray);margin-top:2px}
+.dossier-meta{text-align:right}
+.dossier-amount{font-weight:700;font-size:0.9rem;color:var(--green)}
+.dossier-count{font-size:0.7rem;color:var(--gray)}
+.dossier-active{border:2px solid var(--gold)}
+.dossier-actions{display:flex;gap:6px}
+/* PERSONNES / ANNEES */
+.annee-pill{display:inline-flex;align-items:center;gap:6px;background:var(--light);border:none;border-radius:20px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;color:var(--navy);cursor:pointer;margin:4px 4px 0 0}
+.annee-pill.active{background:var(--navy);color:white}
+.annee-pill.locked::after{content:'🔒';margin-left:2px;font-size:0.7rem}
+.header-dossier-row{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.btn-year-switch{background:rgba(255,255,255,0.12);border:none;color:var(--gold-light);border-radius:8px;padding:4px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.cloture-banner{background:#fff0e0;border:1.5px solid var(--gold);border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:0.82rem}
+.cloture-banner .icon{font-size:1.4rem}
+.btn-cloture{width:100%;padding:13px;background:var(--green);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;margin-bottom:10px}
+.btn-reouvrir{width:100%;padding:11px;background:none;border:1.5px solid var(--red);color:var(--red);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;margin-bottom:10px}
+.annee-add-row{display:flex;gap:8px;margin-top:8px;align-items:center}
+.annee-add-row select{flex:1;padding:9px 12px;border:1.5px solid var(--light);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.85rem;background:white}
+.annee-add-row button{padding:9px 16px;background:var(--navy);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.82rem}
+.btn-small{padding:6px 12px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:600;cursor:pointer}
+.btn-small-gold{background:var(--gold);color:white}
+.btn-small-red{background:var(--red);color:white}
+.btn-small-light{background:var(--light);color:var(--navy)}
+/* DOCS */
+.doc-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--light)}
+.doc-item:last-child{border-bottom:none}
+.doc-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.doc-info{flex:1;min-width:0}
+.doc-name{font-weight:600;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-meta{font-size:0.68rem;color:var(--gray);margin-top:2px}
+.doc-amounts{text-align:right;flex-shrink:0}
+.doc-amount-ded{font-weight:700;font-size:0.85rem;color:var(--green)}
+.doc-amount-brut{font-size:0.68rem;color:var(--gray)}
+.doc-delete{background:none;border:none;color:var(--gray);font-size:1rem;cursor:pointer;padding:4px;flex-shrink:0}
+/* VOLETS RECAP */
+.volet{background:white;border-radius:14px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow)}
+.volet-header{padding:14px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.volet-title{font-family:'DM Serif Display',serif;font-size:1rem;display:flex;align-items:center;gap:8px}
+.volet-totals{text-align:right}
+.volet-total-ded{font-weight:700;font-size:1rem;color:var(--green)}
+.volet-total-brut{font-size:0.7rem;color:var(--gray)}
+.volet-body{display:none;border-top:1px solid var(--light)}
+.volet-body.open{display:block}
+.sous-cat{padding:10px 16px;border-bottom:1px solid var(--light)}
+.sous-cat:last-child{border-bottom:none}
+.sous-cat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.sous-cat-name{font-weight:600;font-size:0.82rem;color:var(--navy)}
+.sous-cat-libelle{font-size:0.7rem;color:var(--gray);font-style:italic;margin-bottom:4px}
+.sous-cat-total{font-weight:700;font-size:0.88rem;color:var(--green)}
+.sous-cat-item{display:flex;justify-content:space-between;padding:4px 0;font-size:0.78rem;border-bottom:1px solid var(--light)}
+.sous-cat-item:last-child{border-bottom:none}
+.sous-cat-item-right{text-align:right}
+.sous-cat-item-amount{font-weight:600;color:var(--green)}
+.sous-cat-item-calc{font-size:0.68rem;color:var(--gray)}
+/* RECAP HEADER */
+.recap-hero{background:var(--navy);color:white;border-radius:14px;padding:20px;margin-bottom:14px;text-align:center}
+.recap-hero h2{font-family:'DM Serif Display',serif;font-size:1.2rem;margin-bottom:2px}
+.recap-hero .year{font-size:0.72rem;color:var(--gold-light);margin-bottom:12px}
+.recap-totals{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.recap-total-box{background:rgba(255,255,255,0.08);border-radius:10px;padding:10px;text-align:center}
+.recap-total-box .amount{font-size:1.3rem;font-weight:700;color:var(--gold-light)}
+.recap-total-box .label{font-size:0.68rem;color:var(--gray);margin-top:2px}
+/* CONFIG */
+.config-box{background:#fff8e6;border:1.5px solid var(--gold);border-radius:14px;padding:14px;margin-bottom:14px}
+.config-box label{font-size:0.7rem;font-weight:700;color:var(--gold);display:block;margin-bottom:6px;text-transform:uppercase}
+.config-row{display:flex;gap:8px}
+.config-row input{flex:1;padding:10px 12px;border:1.5px solid var(--gold);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:white}
+.config-row button{padding:10px 14px;background:var(--gold);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;white-space:nowrap}
+.config-status{font-size:0.7rem;margin-top:6px}
+.rule-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--light);font-size:0.8rem}
+.rule-item:last-child{border-bottom:none}
+.rule-icon{font-size:1.1rem;flex-shrink:0}
+.rule-info{flex:1}
+.rule-name{font-weight:600}
+.rule-desc{font-size:0.7rem;color:var(--gray)}
+.rule-pct{font-weight:700;color:var(--green);font-size:0.82rem}
+/* NEW CAT */
+.new-cat-row{display:flex;gap:8px;margin-top:8px}
+.new-cat-row input{flex:1;padding:9px 12px;border:1.5px dashed var(--gold);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:#fffdf6}
+.new-cat-row button{padding:9px 14px;background:var(--gold);color:white;border:none;border-radius:10px;cursor:pointer}
+/* EXPORT */
+.export-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.btn-export{padding:14px;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.btn-export-pdf{background:var(--red);color:white}
+.btn-export-json{background:var(--blue);color:white}
+.btn-export-email{background:var(--green);color:white;grid-column:span 2}
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:white;padding:10px 20px;border-radius:30px;font-size:0.8rem;opacity:0;transition:all 0.3s;z-index:999;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:30px 20px;color:var(--gray)}
+.empty-icon{font-size:2.5rem;margin-bottom:10px}
+input[type="file"]{display:none}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:flex-end}
+.modal{background:white;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:85vh;overflow-y:auto}
+.modal-title{font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:16px}
+.modal-close{float:right;background:var(--light);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:1rem}
+.doc-item{cursor:pointer;transition:background 0.15s}
+.doc-item:active{background:var(--light)}
+.edit-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:300;display:none;align-items:flex-end}
+.edit-modal.open{display:flex}
+.edit-modal-box{background:white;border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:88vh;overflow-y:auto}
+.edit-modal-title{font-family:'DM Serif Display',serif;font-size:1rem;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.edit-close{background:var(--light);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:1rem;flex-shrink:0}
+</style>
+</head>
+<body>
+<header>
+  <h1>📋 DocFiscal <span class="ai-badge">PRO</span></h1>
+  <div class="header-sub">Déclaration fiscale IPP — Indépendant Belgique</div>
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div class="header-dossier" id="headerDossier">Aucun dossier ouvert</div>
+    <div style="font-size:0.62rem;opacity:0.4;color:white;flex-shrink:0;padding-left:8px">v.57</div>
+  </div>
+</header>
+<nav>
+  <button class="active" onclick="showTab('dossiers',this)">📁 Dossiers</button>
+  <button onclick="showTab('scanner',this)" id="navScanner">📷 Scanner</button>
+  <button onclick="showTab('documents',this)" id="navDocs">📄 Docs</button>
+  <button onclick="showTab('recap',this)" id="navRecap">📊 Récap</button>
+  <button onclick="showTab('categories',this)">🏷️ Catég.</button>
+  <button onclick="showTab('config',this)">⚙️ Config</button>
+</nav>
+
+<!-- DOSSIERS -->
+<div id="tab-dossiers" class="section active">
+
+  <!-- DOSSIER ACTIF -->
+  <div id="dossierActifZone" style="display:none">
+    <div class="card" style="border:2px solid var(--gold)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-size:1.1rem;font-weight:700;color:var(--navy)" id="dossierActifNom">—</div>
+          <div style="font-size:0.72rem;color:var(--gray);margin-top:2px">Dossier actif</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:700;color:var(--green);font-size:1rem" id="dossierActifTotal">0,00 €</div>
+          <div style="font-size:0.7rem;color:var(--gray)">total déductible</div>
+        </div>
+      </div>
+
+      <!-- Sélecteur d'exercice intégré -->
+      <label style="font-size:0.72rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.05em">Exercice fiscal</label>
+      <select id="anneeSelectInline" onchange="changerAnneeInline(this.value)"
+        style="width:100%;margin-top:6px;margin-bottom:14px;padding:11px 14px;border:1.5px solid var(--gold);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:600;background:white;color:var(--navy)">
+      </select>
+
+      <!-- Totaux par volet pour l'exercice sélectionné -->
+      <div id="dossierActifVolets" style="font-size:0.78rem;color:var(--gray);line-height:1.9;border-top:1px solid var(--light);padding-top:10px;margin-bottom:12px"></div>
+
+      <!-- Créer un nouvel exercice -->
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="nouvelExerciceInput" placeholder="Nouvelle année (ex: 2027)" min="2000" max="2099"
+          style="flex:1;padding:10px 12px;border:1.5px solid var(--light);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.88rem">
+        <button onclick="creerNouvelExercice()" style="padding:10px 16px;background:var(--navy);color:white;border:none;border-radius:10px;font-weight:700;font-size:0.85rem;cursor:pointer;white-space:nowrap">+ Créer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTRES DOSSIERS -->
+  <div id="autresDossiersList"></div>
+
+  <!-- CRÉER UN NOUVEAU DOSSIER -->
+  <div class="card" style="margin-top:8px">
+    <div class="card-title">+ Nouveau dossier</div>
+    <div class="form-group">
+      <label>Nom du contribuable</label>
+      <input type="text" id="newDossierNom" placeholder="Ex: François Selvait">
+    </div>
+    <div class="form-group">
+      <label>Premier exercice fiscal</label>
+      <input type="number" id="newDossierAnnee" placeholder="Ex: 2026" value="2026" min="2000" max="2099"
+        style="width:100%;padding:12px;border:1.5px solid var(--light);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.95rem">
+    </div>
+    <button class="btn-primary" onclick="creerDossier()">+ Créer le dossier</button>
+  </div>
+
+  <!-- IMPORT -->
+  <div class="card">
+    <div class="card-title">Importer</div>
+    <button class="btn-light" onclick="document.getElementById('importJSON').click()">📥 Importer sauvegarde JSON</button>
+    <input type="file" id="importJSON" accept=".json" onchange="importerJSON(event)">
+    <button class="btn-light" style="margin-top:8px" onclick="document.getElementById('importCSV').click()">📊 Importer fichier CSV</button>
+    <input type="file" id="importCSV" accept=".csv" onchange="importerCSV(event)">
+  </div>
+</div>
+
+<!-- SCANNER -->
+<div id="tab-scanner" class="section">
+  <div id="noScanDossier" class="card" style="text-align:center;padding:30px">
+    <div style="font-size:2rem;margin-bottom:10px">📁</div>
+    <p style="color:var(--gray);font-size:0.85rem">Ouvrez ou créez un dossier d'abord</p>
+  </div>
+  <div id="apiKeyWarning" style="display:none;background:#fff0f0;border:1.5px solid var(--red);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:0.82rem;color:var(--red)">
+    ⚠️ <strong>Clé API absente</strong> — L'IA ne fonctionnera pas. <span onclick="showTab('config',document.querySelectorAll('nav button')[5])" style="text-decoration:underline;cursor:pointer">Configurer dans ⚙️ Config →</span>
+  </div>
+  <div id="scanContent" style="display:none">
+    <div class="btn-row">
+      <button class="btn-action btn-scan" onclick="document.getElementById('cameraInput').click()"><span class="btn-icon">📷</span>Scanner</button>
+      <button class="btn-action btn-upload" onclick="document.getElementById('fileInput').click()"><span class="btn-icon">📎</span>Télécharger</button>
+    </div>
+    <div class="btn-row" style="margin-top:-6px">
+      <button class="btn-action" style="background:linear-gradient(135deg,#e07b39,#c9a84c);color:white" onclick="ouvrirSession('repas')"><span class="btn-icon">🍽️</span>Session Restos</button>
+      <button class="btn-action" style="background:linear-gradient(135deg,#1a5fa8,#2d9c8a);color:white" onclick="ouvrirSession('carburant')"><span class="btn-icon">⛽</span>Session Carburant</button>
+    </div>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleCapture(event)">
+    <input type="file" id="fileInput" accept="image/*" onchange="handleCapture(event)">
+    <input type="file" id="sessionCamera" accept="image/*" capture="environment" onchange="handleSessionCapture(event)">
+    <input type="file" id="sessionFile" accept="image/*" onchange="handleSessionCapture(event)">
+
+    <!-- SESSION GROUPÉE -->
+    <div id="sessionZone" style="display:none">
+      <div id="sessionBox" style="border-radius:16px;padding:16px;margin-bottom:14px;color:white">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div>
+            <div style="font-size:0.72rem;font-weight:700;opacity:0.8;text-transform:uppercase" id="sessionTypeLabel">Session</div>
+            <div style="font-size:1rem;font-weight:700" id="sessionTitle">—</div>
+          </div>
+          <button onclick="fermerSession()" style="background:rgba(255,255,255,0.15);border:none;color:white;border-radius:8px;padding:6px 12px;font-size:0.78rem;font-weight:600;cursor:pointer">✕ Annuler</button>
+        </div>
+        <!-- CUMUL -->
+        <div style="background:rgba(255,255,255,0.12);border-radius:12px;padding:14px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:0.7rem;opacity:0.7" id="sessionCount">0 ticket(s)</div>
+              <div style="font-size:1.6rem;font-weight:700" id="sessionTotal">0,00 €</div>
+              <div style="font-size:0.72rem;opacity:0.8" id="sessionDed">Déductible: 0,00 €</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:0.68rem;opacity:0.7">Coefficient</div>
+              <div id="sessionCoeffDisplay" style="font-size:0.85rem;font-weight:600">—</div>
+            </div>
+          </div>
+          <!-- Ajustement coefficient -->
+          <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap" id="sessionCoeffBtns"></div>
+        </div>
+        <!-- LISTE TICKETS -->
+        <div id="sessionTicketsList" style="max-height:180px;overflow-y:auto;margin-bottom:12px"></div>
+        <!-- BOUTONS -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+          <button onclick="document.getElementById('sessionCamera').click()" style="padding:12px;background:rgba(255,255,255,0.15);border:none;color:white;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer">📷 Ticket suivant</button>
+          <button onclick="document.getElementById('sessionFile').click()" style="padding:12px;background:rgba(255,255,255,0.15);border:none;color:white;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer">📎 Télécharger</button>
+          <button onclick="ajouterTicketManuel()" style="padding:12px;background:rgba(255,255,255,0.15);border:none;color:white;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer">✏️ Manuel</button>
+        </div>
+        <button id="sessionClotureBtn" onclick="cloturerSession()" disabled style="width:100%;padding:14px;background:white;color:#0f1f3d;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:700;cursor:pointer;opacity:0.4">✓ Enregistrer la session</button>
+      </div>
+      <!-- Analyse en cours dans session -->
+      <div id="sessionAnalyzing" style="display:none;text-align:center;padding:20px;background:white;border-radius:14px;margin-bottom:14px">
+        <div style="font-size:1.8rem;animation:spin 1s linear infinite;display:inline-block">🔍</div>
+        <p style="font-size:0.82rem;color:var(--gray);margin-top:8px">Lecture du ticket…</p>
+      </div>
+    </div>
+
+    <div id="aiZone" style="display:none">
+      <img id="imgPreview" class="img-preview">
+      <div id="analyzingBox" class="ai-box analyzing" style="display:none">
+        <div class="analyzing-spinner">🔍</div>
+        <p>Claude analyse et calcule le montant déductible…</p>
+      </div>
+      <div id="aiResultBox" class="ai-box" style="display:none">
+        <div class="ai-box-title">🤖 Analyse IA — Classement fiscal</div>
+        <div class="ai-result-row"><span class="ai-result-label">Volet</span><span class="ai-result-value" id="aiVolet">—</span></div>
+        <div class="ai-result-row"><span class="ai-result-label">Catégorie</span><span class="ai-result-value" id="aiCat">—</span></div>
+        <div class="ai-result-row"><span class="ai-result-label">Référence</span><span class="ai-result-value" id="aiRef">—</span></div>
+        <div class="ai-result-row"><span class="ai-result-label">Type</span><span class="ai-result-value" id="aiType">—</span></div>
+        <div class="ai-result-row"><span class="ai-result-label">Confiance</span><span id="aiConfidence" class="ai-confidence">—</span></div>
+        <div id="aiQuestion" class="ai-question" style="display:none"></div>
+        <div id="aiMontantWarning" style="display:none;background:rgba(176,58,46,0.18);border:1px solid var(--red);border-radius:10px;padding:8px 12px;font-size:0.78rem;margin-bottom:10px;color:#ffd5d0"></div>
+        <div class="calcul-box" id="calculBox">
+          <div class="calcul-title">📐 Calcul fiscal</div>
+          <div class="calcul-step"><span class="calcul-step-label" id="lbl1">Montant brut</span><span class="calcul-step-value" id="val1">—</span></div>
+          <div class="calcul-step" id="step2" style="display:none"><span class="calcul-step-label" id="lbl2">×</span><span class="calcul-step-value" id="val2">—</span></div>
+          <div class="calcul-step" id="step3" style="display:none"><span class="calcul-step-label" id="lbl3">×</span><span class="calcul-step-value" id="val3">—</span></div>
+          <div class="calcul-final"><span class="calcul-final-label">= Montant déductible</span><span class="calcul-final-value" id="valFinal">—</span></div>
+          <div class="coeff-zone" id="coeffZone" style="display:none">
+            <div class="coeff-label">Ajuster le coefficient :</div>
+            <div class="coeff-buttons" id="coeffButtons"></div>
+          </div>
+        </div>
+        <button class="btn-confirm" onclick="confirmAI()">✓ Confirmer et enregistrer</button>
+        <button class="btn-modify" onclick="showManualForm()">✏️ Modifier manuellement</button>
+        <button class="btn-modify" onclick="recommencerScan()">🔄 Recommencer le scan</button>
+      </div>
+      <div id="manualForm" class="card" style="display:none">
+        <div class="card-title">Encoder manuellement</div>
+        <div class="form-group"><label>Volet fiscal</label>
+          <select id="manVolet" onchange="updateManualCats()">
+            <option value="frais">Volet 1 — Frais Réels</option>
+            <option value="assurances">Volet 2 — Assurances</option>
+            <option value="officiels">Volet 3 — Documents Officiels</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Catégorie</label><select id="manCat"></select></div>
+        <div class="form-group"><label>Référence</label><input type="text" id="manRef" placeholder="Ex: ERGO 10557844 PCLI"></div>
+        <div class="form-group"><label>Montant brut (€)</label><input type="number" id="manBrut" placeholder="0,00" step="0.01" min="0" oninput="updateManualCalc()"></div>
+        <div class="form-group"><label>Coefficient déductible</label>
+          <select id="manCoeff" onchange="updateManualCalc()">
+            <option value="1">100%</option>
+            <option value="0.8571">6/7 (≈85,7%)</option>
+            <option value="0.7143">5/7 (≈71,4%)</option>
+            <option value="0.75">75%</option>
+            <option value="0.6428">6/7 × 75% (≈48,2%)</option>
+            <option value="0.5357">5/7 × 75% (≈40,2%)</option>
+            <option value="0.5">50%</option>
+          </select>
+        </div>
+        <div style="background:var(--light);border-radius:10px;padding:12px;margin-bottom:12px;font-size:0.85rem">
+          Montant déductible : <strong id="manResult">—</strong>
+        </div>
+        <div class="form-group"><label>Date du document</label><input type="date" id="manDate"></div>
+        <div class="form-group"><label>Note / Annexe</label><input type="text" id="manNote" placeholder="Ex: Annexe revenus, N° police..."></div>
+        <button class="btn-primary" onclick="saveManual()">✓ Enregistrer</button>
+        <button class="btn-light" onclick="resetScanner()">Annuler</button>
+      </div>
+    </div>
+    <div id="initialState" class="card">
+      <div style="text-align:center;padding:20px 0;color:var(--gray)">
+        <div style="font-size:2.5rem;margin-bottom:10px">🤖</div>
+        <p style="font-size:0.85rem" id="initialMsg">Scannez un document.<br>Claude identifie, classe et calcule automatiquement.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DOCUMENTS -->
+<div id="tab-documents" class="section">
+  <div id="noDocDossier" class="card" style="text-align:center;padding:30px">
+    <p style="color:var(--gray);font-size:0.85rem">Ouvrez un dossier d'abord</p>
+  </div>
+  <div id="docsContent" style="display:none">
+    <!-- Sous-onglets -->
+    <div style="display:flex;gap:0;margin-bottom:14px;background:white;border-radius:12px;padding:4px;box-shadow:var(--shadow)">
+      <button id="subTabDocs" onclick="showSubTab('docs')" style="flex:1;padding:9px 4px;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:600;cursor:pointer;background:var(--navy);color:white">📄 Documents</button>
+      <button id="subTabRestos" onclick="showSubTab('restos')" style="flex:1;padding:9px 4px;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:600;cursor:pointer;background:none;color:var(--gray)">🍽️ Restos</button>
+      <button id="subTabCarburant" onclick="showSubTab('carburant')" style="flex:1;padding:9px 4px;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:600;cursor:pointer;background:none;color:var(--gray)">⛽ Carburant</button>
+    </div>
+
+    <!-- Sous-onglet Documents -->
+    <div id="subDocs">
+      <div class="card">
+        <div class="card-title">Documents <span class="badge" id="docCount">0</span></div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input type="text" id="docSearch" placeholder="🔎 Rechercher..." oninput="renderDocList()" style="flex:1;padding:9px 12px;border:1.5px solid var(--light);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.85rem">
+          <select id="docSort" onchange="renderDocList()" style="padding:9px 8px;border:1.5px solid var(--light);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.8rem;background:white">
+            <option value="recent">Plus récent</option>
+            <option value="date_desc">Date ↓</option>
+            <option value="date_asc">Date ↑</option>
+            <option value="montant_desc">Montant ↓</option>
+            <option value="montant_asc">Montant ↑</option>
+          </select>
+        </div>
+        <div id="docList"><div class="empty"><div class="empty-icon">📂</div><p>Aucun document.</p></div></div>
+      </div>
+    </div>
+
+    <!-- Sous-onglet Restos -->
+    <div id="subRestos" style="display:none">
+      <div class="card">
+        <div class="card-title">🍽️ Tickets Restaurants <span class="badge" id="restosCount">0</span></div>
+        <div id="restosList"><div class="empty"><div class="empty-icon">🍽️</div><p>Aucun ticket restaurant.</p></div></div>
+      </div>
+    </div>
+
+    <!-- Sous-onglet Carburant -->
+    <div id="subCarburant" style="display:none">
+      <div class="card">
+        <div class="card-title">⛽ Tickets Carburant <span class="badge" id="carburantCount">0</span></div>
+        <div id="carburantList"><div class="empty"><div class="empty-icon">⛽</div><p>Aucun ticket carburant.</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RECAP -->
+<div id="tab-recap" class="section">
+  <div id="noRecapDossier" class="card" style="text-align:center;padding:30px">
+    <p style="color:var(--gray);font-size:0.85rem">Ouvrez un dossier d'abord</p>
+  </div>
+  <div id="recapContent" style="display:none">
+    <div class="recap-hero">
+      <h2 id="recapNom">—</h2>
+      <div class="year" id="recapAnnee">—</div>
+      <div class="recap-totals">
+        <div class="recap-total-box"><div class="amount" id="recapTotalDed">0,00 €</div><div class="label">Total déductible</div></div>
+        <div class="recap-total-box"><div class="amount" id="recapTotalBrut">0,00 €</div><div class="label">Total brut</div></div>
+      </div>
+    </div>
+    <div id="clotureBanner" class="cloture-banner" style="display:none">
+      <span class="icon">🔒</span>
+      <div><strong>Année clôturée</strong><br><span style="color:var(--gray);font-size:0.78rem">Consultation, impression et envoi uniquement.</span></div>
+    </div>
+    <div class="export-row">
+      <button class="btn-export btn-export-pdf" onclick="exportPDF()"><span style="font-size:1.3rem">📄</span>Export PDF</button>
+      <button class="btn-export btn-export-json" onclick="exportJSON()"><span style="font-size:1.3rem">💾</span>Sauvegarde</button>
+    </div>
+    <button class="btn-export btn-export-email" style="width:100%;margin-bottom:8px" onclick="envoyerEmail()"><span style="font-size:1.1rem">📧</span> Envoyer au comptable</button>
+    <button class="btn-export" style="width:100%;margin-bottom:14px;background:#555;color:white" onclick="exportComparatif()"><span style="font-size:1.1rem">📊</span> Comparatif pluriannuel (PDF)</button>
+    <button class="btn-export" style="width:100%;margin-bottom:14px;background:var(--navy);color:white" onclick="exportDossierComplet()"><span style="font-size:1.1rem">📑</span> Export complet (récap + copies documents, hors Restos/Carburant)</button>
+    <button class="btn-export" style="width:100%;margin-bottom:10px;background:#c9a84c;color:white" onclick="exportTicketsRestosCarburant('repas')"><span style="font-size:1.1rem">🍽️</span> Copies tickets Restaurants (PDF à part)</button>
+    <button class="btn-export" style="width:100%;margin-bottom:14px;background:#3a7bd5;color:white" onclick="exportTicketsRestosCarburant('carburant')"><span style="font-size:1.1rem">⛽</span> Copies tickets Carburant (PDF à part)</button>
+    <div id="voletsList"></div>
+  </div>
+</div>
+
+<!-- CATÉGORIES -->
+<div id="tab-categories" class="section">
+  <div class="card">
+    <div class="card-title">+ Nouvelle catégorie</div>
+    <div class="form-group"><label>Volet fiscal</label>
+      <select id="newCatVolet" onchange="">
+        <option value="frais">🧾 Frais Réels Professionnels</option>
+        <option value="assurances">🛡️ Assurances</option>
+        <option value="officiels">📋 Documents Officiels</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Nom de la catégorie</label>
+      <input type="text" id="newCatLabel" placeholder="Ex: Formation professionnelle">
+    </div>
+    <div class="form-group"><label>Libellé pour le comptable (optionnel)</label>
+      <input type="text" id="newCatLibelle" placeholder="Ex: Frais de formation continue">
+    </div>
+    <div class="form-group"><label>Coefficient déductible (%)</label>
+      <input type="number" id="newCatCoeff" value="100" min="0" max="100" step="1">
+    </div>
+    <button class="btn-primary" onclick="ajouterCategorie()">+ Ajouter la catégorie</button>
+  </div>
+  <div id="categoriesList"></div>
+</div>
+
+<!-- CONFIG -->
+<div id="tab-config" class="section">
+  <div class="card" id="cardGestionExercice" style="display:none">
+    <div class="card-title">📅 Exercice actif — <span id="gestionAnneeLabel">—</span></div>
+    <div id="gestionClotureBanner" class="cloture-banner" style="display:none">
+      <span class="icon">🔒</span>
+      <div><strong>Exercice clôturé</strong><br><span style="color:var(--gray);font-size:0.78rem">Lecture seule — utilisez "Réouverture" pour modifier.</span></div>
+    </div>
+    <p style="font-size:0.78rem;color:var(--gray);line-height:1.6;margin-bottom:10px">
+      Ces actions concernent uniquement l'exercice <strong id="gestionAnneeLabel2">—</strong> de <strong id="gestionNomLabel">—</strong> actuellement ouvert.
+    </p>
+    <button class="btn-cloture" id="btnCloturer" onclick="demanderCloture()">🔒 Clôturer l'exercice — définitif</button>
+    <button class="btn-reouvrir" id="btnReouvrir" style="display:none" onclick="demanderReouverture()">🔓 Réouverture exceptionnelle</button>
+    <button class="btn-reouvrir" id="btnResetExercice" onclick="demanderResetExercice()" style="border-color:var(--red);color:var(--red)">🗑 Réinitialiser l'exercice (tout effacer)</button>
+  </div>
+  <div class="config-box">
+    <label>🔑 Clé API Anthropic</label>
+    <div class="config-row">
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
+      <button onclick="saveApiKey()">Sauver</button>
+    </div>
+    <div class="config-status" id="apiStatus"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🗂 Gestion des dossiers</div>
+    <div id="configDossiersList"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💾 Sauvegarde globale <span class="badge" id="lastBackupBadge"></span></div>
+    <p style="font-size:0.78rem;color:var(--gray);line-height:1.6;margin-bottom:6px">
+      Toutes les données sont stockées uniquement sur cet appareil. Un nettoyage de Safari ou un changement d'iPhone peut tout effacer.
+    </p>
+    <div style="background:#fff8e6;border:1.5px solid var(--gold);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:0.8rem;color:var(--navy);line-height:1.5">
+      ⭐ <strong>Ce fichier suffit à tout récupérer</strong> en cas de perte totale :<br>
+      dossiers, documents, catégories et clé API.
+    </div>
+    <button class="btn-primary" onclick="exportTout()">💾 SAUVEGARDER TOUT — données + clé API</button>
+    <button class="btn-light" style="margin-top:8px" onclick="document.getElementById('importTout').click()">♻️ RESTAURER depuis une sauvegarde</button>
+    <input type="file" id="importTout" accept=".json" onchange="importerTout(event)">
+    <p style="font-size:0.72rem;color:var(--gray);margin-top:10px;text-align:center">Recommandé : sauvegarder vers iCloud Drive ou email chaque semaine</p>
+  </div>
+  <div class="card">
+    <div class="card-title">📱 Application (programme)</div>
+    <p style="font-size:0.78rem;color:var(--gray);line-height:1.6;margin-bottom:10px">
+      Ceci télécharge le fichier de l'application elle-même (le code), pas vos données.<br>
+      Conservez-le de côté (Fichiers, email...) au cas où vous perdriez l'accès à GitHub : il suffit de le re-héberger pour retrouver l'app.
+    </p>
+    <button class="btn-light" onclick="exporterApplication()">⬇️ Télécharger l'application (index.html)</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Règles fiscales — Indépendant BE</div>
+    <div id="rulesList"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">À propos</div>
+    <p style="font-size:0.78rem;color:var(--gray);line-height:1.7">
+      DocFiscal Pro est conçu pour les administrateurs indépendants belges.<br>
+      Les calculs suivent les règles IPP belges 2026.<br>
+      Données sauvegardées localement sur votre appareil.<br>
+      <span style="color:var(--gray);opacity:0.6">Version 54 — 14/06/2026</span>
+    </p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL ÉDITION TICKET INDIVIDUEL -->
+<div class="edit-modal" id="editTicketModal">
+  <div class="edit-modal-box" onclick="event.stopPropagation()">
+    <div class="edit-modal-title">✏️ Modifier le ticket
+      <button class="edit-close" onclick="document.getElementById('editTicketModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="form-group"><label>Référence</label>
+      <input type="text" id="editTicketRef" placeholder="Ex: Brasserie Monopole 13/06">
+    </div>
+    <div class="form-group"><label>Montant brut TTC (€)</label>
+      <input type="number" id="editTicketMontant" placeholder="0,00" step="0.01" min="0">
+    </div>
+    <div class="form-group"><label>Date</label>
+      <input type="date" id="editTicketDate">
+    </div>
+    <button class="btn-primary" onclick="sauvegarderEditTicket()">✓ Enregistrer les modifications</button>
+    <button class="btn-light" style="background:#fff0f0;color:var(--red);margin-top:8px" onclick="supprimerEditTicket()">🗑 Supprimer ce ticket</button>
+  </div>
+</div>
+
+<!-- MODAL EDITION -->
+<div class="edit-modal" id="editModal" onclick="closeEditModal(event)">
+  <div class="edit-modal-box" onclick="event.stopPropagation()">
+    <div class="edit-modal-title">
+      ✏️ Modifier le document
+      <button class="edit-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <input type="hidden" id="editDocId">
+    <div class="form-group"><label>Volet fiscal</label>
+      <select id="editVolet" onchange="updateEditCats()">
+        <option value="frais">Volet 1 — Frais Réels</option>
+        <option value="assurances">Volet 2 — Assurances</option>
+        <option value="officiels">Volet 3 — Documents Officiels</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Catégorie</label><select id="editCat"></select></div>
+    <div class="form-group"><label>Référence</label><input type="text" id="editRef" placeholder="Référence du document"></div>
+    <div class="form-group"><label>Montant brut (€)</label><input type="number" id="editBrut" placeholder="0,00" step="0.01" min="0" oninput="updateEditCalc()"></div>
+    <div class="form-group"><label>Coefficient déductible</label>
+      <select id="editCoeff" onchange="updateEditCalc()">
+        <option value="1">100%</option>
+        <option value="0.8571">6/7 (≈85,7%)</option>
+        <option value="0.7143">5/7 (≈71,4%)</option>
+        <option value="0.75">75%</option>
+        <option value="0.6428">6/7 × 75% (≈48,2%)</option>
+        <option value="0.5357">5/7 × 75% (≈40,2%)</option>
+        <option value="0.5">50%</option>
+      </select>
+    </div>
+    <div style="background:var(--light);border-radius:10px;padding:12px;margin-bottom:12px;font-size:0.85rem">
+      Montant déductible : <strong id="editResult">—</strong>
+    </div>
+    <div class="form-group"><label>Date</label><input type="date" id="editDate"></div>
+    <div class="form-group"><label>Note / Annexe</label><input type="text" id="editNote" placeholder="Ex: Annexe revenus, N° police..."></div>
+    <button class="btn-primary" onclick="saveEdit()">✓ Enregistrer les modifications</button>
+    <button class="btn-light" style="background:#fff0f0;color:var(--red)" onclick="deleteFromModal()">🗑 Supprimer ce document</button>
+  </div>
+</div>
+
+<!-- MODAL DOUBLON DOSSIER -->
+<div class="edit-modal" id="doublonModal">
+  <div class="edit-modal-box" onclick="event.stopPropagation()">
+    <div class="edit-modal-title">
+      ⚠️ Doublon détecté
+      <button class="edit-close" onclick="document.getElementById('doublonModal').classList.remove('open');pendingDoc=null;">✕</button>
+    </div>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:16px">Deux documents ont le même montant brut de <strong id="doublonMontant">—</strong>. S'agit-il d'un doublon ?</p>
+    <div style="background:var(--light);border-radius:12px;padding:12px;margin-bottom:16px;font-size:0.82rem">
+      <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #ddd">
+        <div style="font-weight:600;color:var(--gray);font-size:0.7rem;text-transform:uppercase;margin-bottom:4px">Document existant</div>
+        <div id="doublonRef1" style="font-weight:600">—</div>
+        <div id="doublonDate1" style="color:var(--gray);font-size:0.75rem">—</div>
+      </div>
+      <div>
+        <div style="font-weight:600;color:var(--gold);font-size:0.7rem;text-transform:uppercase;margin-bottom:4px">Nouveau document</div>
+        <div id="doublonRef2" style="font-weight:600">—</div>
+        <div id="doublonDate2" style="color:var(--gray);font-size:0.75rem">—</div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="doublonGarderLesDeuxl()">✓ Garder les deux — ce sont des documents différents</button>
+    <button class="btn-light" style="background:#fff0f0;color:var(--red);margin-top:8px" onclick="doublonGarderUn()">🗑 Ne garder qu'un seul — c'est un doublon</button>
+  </div>
+</div>
+
+<!-- MODAL SUPPRESSION DOSSIER -->
+<div class="edit-modal" id="supprimerDossierModal">
+  <div class="edit-modal-box" onclick="event.stopPropagation()">
+    <div class="edit-modal-title">🗑 Supprimer le dossier ?</div>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:12px">
+      Cette action va supprimer définitivement le dossier <strong id="supprimerDossierNom">—</strong> et <strong>tous ses exercices</strong> et documents.<br><br>
+      <strong>Cette action est irréversible.</strong> Exportez une sauvegarde avant si besoin.
+    </p>
+    <button class="btn-primary" style="background:var(--red)" onclick="confirmerSupprimerDossier()">🗑 Oui, supprimer définitivement</button>
+    <button class="btn-light" onclick="document.getElementById('supprimerDossierModal').classList.remove('open')">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMATION CLOTURE -->
+<div class="edit-modal" id="clotureModal">
+  <div class="edit-modal-box" onclick="event.stopPropagation()">
+    <div class="edit-modal-title">🔒 Clôturer l'exercice ?</div>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:12px">
+      Une fois clôturé, l'exercice <strong id="clotureAnneeLabel">—</strong> de <strong id="clotureNomLabel">—</strong> ne pourra plus être modifié (ajout, édition, suppression de documents).<br><br>
+      Vous pourrez toujours consulter, imprimer et envoyer le récapitulatif.
+    </p>
+    <p style="font-size:0.85rem;font-weight:600;margin-bottom:8px">Confirmez-vous cette clôture définitive ?</p>
+    <button class="btn-primary" onclick="confirmerCloture()">✓ Oui, clôturer définitivement</button>
+    <button class="btn-light" onclick="document.getElementById('clotureModal').classList.remove('open')">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMATION RESET EXERCICE -->
+<div class="edit-modal" id="resetModal">
+  <div class="edit-modal-box" onclick="event.stopPropagation()">
+    <div class="edit-modal-title">🗑 Réinitialiser l'exercice ?</div>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:12px">
+      Cette action va <strong>supprimer définitivement tous les documents</strong> (<span id="resetCount">0</span> document(s)) de l'exercice <strong id="resetAnneeLabel">—</strong> de <strong id="resetNomLabel">—</strong>.<br><br>
+      L'exercice restera créé mais sera vide. <strong>Cette action est irréversible</strong> — exportez une sauvegarde avant si besoin.
+    </p>
+    <p style="font-size:0.85rem;font-weight:600;margin-bottom:8px">Confirmez-vous la réinitialisation complète ?</p>
+    <button class="btn-primary" style="background:var(--red)" onclick="confirmerResetExercice()">🗑 Oui, tout effacer définitivement</button>
+    <button class="btn-light" onclick="document.getElementById('resetModal').classList.remove('open')">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMATION REOUVERTURE -->
+<div class="edit-modal" id="reouvertureModal">
+  <div class="edit-modal-box" onclick="event.stopPropagation()">
+    <div class="edit-modal-title">🔓 Réouverture exceptionnelle ?</div>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:12px">
+      L'exercice <strong id="reouvAnneeLabel">—</strong> de <strong id="reouvNomLabel">—</strong> est actuellement clôturé.<br><br>
+      La réouverture permettra à nouveau la modification des documents. À n'utiliser qu'en cas d'erreur avérée.
+    </p>
+    <p style="font-size:0.85rem;font-weight:600;margin-bottom:8px">Confirmez-vous la réouverture exceptionnelle ?</p>
+    <button class="btn-primary" onclick="confirmerReouverture()">✓ Oui, rouvrir exceptionnellement</button>
+    <button class="btn-light" onclick="document.getElementById('reouvertureModal').classList.remove('open')">Annuler</button>
+  </div>
+</div>
+
+<script>
+// ═══ DONNÉES ═══════════════════════════════════════════
+const VOLETS = {
+  frais: {
+    label: 'Frais Réels Professionnels',
+    icon: '🧾',
+    color: '#1a5fa8',
+    cats: {
+      'carburant':    {label:'Carburant professionnel',        libelle:'Frais de déplacement — carburant',           coeff:6/7*0.75, desc:'×6/7×75%', opts:['6/7×75%','5/7×75%','6/7×100%']},
+      'vehicule':     {label:'Frais de véhicule',              libelle:'Frais de véhicule professionnel',            coeff:6/7*0.75, desc:'×6/7×75%', opts:['6/7×75%','5/7×75%']},
+      'repas':        {label:'Repas et réceptions',            libelle:'Frais de réception et repas d\'affaires',    coeff:6/7,      desc:'×6/7',     opts:['6/7','5/7','100%']},
+      'representation':{label:'Frais de représentation',      libelle:'Frais de représentation clients',            coeff:0.5,      desc:'×50%',     opts:['50%','75%','100%']},
+      'telephone':    {label:'Téléphone / GSM',                libelle:'Frais de communication professionnelle',     coeff:1,        desc:'×100%',    opts:null},
+      'bureau':       {label:'Bureau à domicile',              libelle:'Frais de bureau à domicile',                 coeff:0.15,     desc:'×15%',     opts:['10%','15%','20%','25%','30%']},
+      'cotisation':   {label:'Cotisations professionnelles',   libelle:'Cotisations pro (UCM, IPI, ordres...)',      coeff:1,        desc:'×100%',    opts:null},
+      'avocat':       {label:'Honoraires / Frais juridiques',  libelle:'Honoraires avocats et frais juridiques',    coeff:1,        desc:'×100%',    opts:null},
+      'frais_divers': {label:'Frais professionnels divers',    libelle:'Autres frais professionnels',                coeff:1,        desc:'×100%',    opts:['100%','75%','50%']},
+    }
+  },
+  assurances: {
+    label: 'Assurances',
+    icon: '🛡️',
+    color: '#c9a84c',
+    cats: {
+      'pcli':         {label:'Assurance vie PCLI/PLCI',        libelle:'Épargne long terme — case 1353/2353',        coeff:1, desc:'×100%', opts:null},
+      'ep':           {label:'Assurance épargne EP',           libelle:'Assurance épargne pension — case 1254/2254', coeff:1, desc:'×100%', opts:null},
+      'rc_pro':       {label:'RC Professionnelle',             libelle:'Assurance RC professionnelle (frais réels)', coeff:1, desc:'×100%', opts:null},
+      'srd':          {label:'Solde restant dû',               libelle:'Assurance solde restant dû — case 1370/2370',coeff:1, desc:'×100%', opts:null},
+      'hospi':        {label:'Hospitalisation',                libelle:'Assurance hospitalisation (info)',           coeff:1, desc:'×100%', opts:null},
+      'assur_autre':  {label:'Autre assurance',                libelle:'Autre assurance professionnelle',           coeff:1, desc:'×100%', opts:null},
+    }
+  },
+  officiels: {
+    label: 'Documents Officiels',
+    icon: '📋',
+    color: '#2d7a4f',
+    cats: {
+      'fiche281':     {label:'Fiche 281.10 / 281.20',          libelle:'Fiche de rémunération officielle',           coeff:1, desc:'×100%', opts:null},
+      'cotis_inasti': {label:'Cotisations sociales INASTI',    libelle:'Cotisations sociales indépendant',           coeff:1, desc:'×100%', opts:null},
+      'aer':          {label:'Avertissement-extrait de rôle',  libelle:'IPP dû exercice précédent',                  coeff:1, desc:'×100%', opts:null},
+      'va':           {label:'Versements anticipés',           libelle:'VA1/VA2/VA3/VA4',                            coeff:1, desc:'×100%', opts:null},
+      'doc_autre':    {label:'Autre document officiel',        libelle:'Document fiscal officiel',                   coeff:1, desc:'×100%', opts:null},
+    }
+  }
+};
+
+// ═══ CATÉGORIES PERSONNALISÉES ═══════════════════════════
+let customCats = JSON.parse(localStorage.getItem('docfiscal_customcats')||'{"frais":{},"assurances":{},"officiels":{}}');
+function fusionnerCustomCats(){
+  Object.keys(customCats).forEach(volet=>{
+    if(!VOLETS[volet]) return;
+    Object.entries(customCats[volet]).forEach(([key,def])=>{
+      VOLETS[volet].cats[key] = def;
+    });
+  });
+}
+fusionnerCustomCats();
+
+function sauvegarderCustomCats(){
+  localStorage.setItem('docfiscal_customcats', JSON.stringify(customCats));
+}
+
+function slugify(s){
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,24) || 'cat';
+}
+
+function ajouterCategorie(){
+  const volet = document.getElementById('newCatVolet').value;
+  const label = document.getElementById('newCatLabel').value.trim();
+  const libelle = document.getElementById('newCatLibelle').value.trim();
+  let pct = parseFloat(document.getElementById('newCatCoeff').value);
+  if(!label){showToast('⚠️ Entrez un nom de catégorie');return;}
+  if(isNaN(pct)||pct<0||pct>100) pct = 100;
+  const coeff = pct/100;
+  let key = 'custom_'+slugify(label);
+  // Éviter collision
+  let i=2;
+  while(VOLETS[volet].cats[key]) key = 'custom_'+slugify(label)+'_'+(i++);
+  const def = {label, libelle: libelle||label, coeff, desc: '×'+pct+'%', opts:null, custom:true};
+  customCats[volet][key] = def;
+  VOLETS[volet].cats[key] = def;
+  sauvegarderCustomCats();
+  document.getElementById('newCatLabel').value='';
+  document.getElementById('newCatLibelle').value='';
+  document.getElementById('newCatCoeff').value='100';
+  renderCategories();
+  showToast('✅ Catégorie "'+label+'" ajoutée');
+}
+
+function supprimerCategorie(volet, key){
+  if(!confirm('Supprimer cette catégorie ? Les documents déjà encodés avec cette catégorie resteront inchangés.')) return;
+  delete customCats[volet][key];
+  delete VOLETS[volet].cats[key];
+  sauvegarderCustomCats();
+  renderCategories();
+  showToast('🗑 Catégorie supprimée');
+}
+
+function renderCategories(){
+  const el = document.getElementById('categoriesList');
+  if(!el) return;
+  let html = '';
+  Object.entries(VOLETS).forEach(([voletKey, voletDef])=>{
+    html += `<div class="card"><div class="card-title">${voletDef.icon} ${voletDef.label}</div>`;
+    Object.entries(voletDef.cats).forEach(([catKey, catDef])=>{
+      const isCustom = !!catDef.custom;
+      html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--light)">
+        <div>
+          <div style="font-size:0.85rem;font-weight:600">${catDef.label}${isCustom?' <span class="badge" style="background:var(--blue)">perso</span>':''}</div>
+          <div style="font-size:0.7rem;color:var(--gray)">${catDef.libelle||''} · ${catDef.desc||'×100%'}</div>
+        </div>
+        ${isCustom?'<button class="btn-small btn-small-red" onclick="supprimerCategorie(\''+voletKey+'\',\''+catKey+'\')">🗑</button>':''}
+      </div>`;
+    });
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+let dossiers = JSON.parse(localStorage.getItem('docfiscal_dossiers')||'[]');
+let dossierActif = null;
+let anneeActiveKey = null;
+let currentImageData = null;
+let aiSuggestion = null;
+let apiKey = localStorage.getItem('docfiscal_apikey')||'';
+
+// Migration ancien format {id,nom,annee,documents:[]} → {id,nom,annees:{X:{documents:[],cloture:false}}}
+function migrerDossiers(){
+  let changed = false;
+  const migVersion = parseInt(localStorage.getItem('docfiscal_migversion')||'0');
+  dossiers.forEach(d=>{
+    if(!d.annees){
+      const annee = d.annee || '2026';
+      d.annees = {};
+      d.annees[annee] = {documents: d.documents||[], tickets_repas:[], tickets_carburant:[], cloture: false};
+      delete d.documents;
+      delete d.annee;
+      changed = true;
+    }
+    // Migrer anciennes années sans tickets_repas/carburant
+    Object.keys(d.annees).forEach(a=>{
+      const ann = d.annees[a];
+      if(!ann.tickets_repas) ann.tickets_repas = [];
+      if(!ann.tickets_carburant) ann.tickets_carburant = [];
+      // Nettoyer tickets mal migrés (montantDed > montant = erreur de calcul v56)
+      if(migVersion < 2){
+        ann.tickets_repas = ann.tickets_repas.filter(t=> !t.montantDed || t.montantDed <= (t.montant||0) * 1.1);
+        ann.tickets_carburant = ann.tickets_carburant.filter(t=> !t.montantDed || t.montantDed <= (t.montant||0) * 1.1);
+        changed = true;
+      }
+      // Migrer anciens documents groupés session vers tickets individuels
+      if(ann.documents){
+        ann.documents = ann.documents.filter(doc=>{
+          if(doc.tickets && doc.tickets.length && (doc.cat==='repas'||doc.cat==='carburant')){
+            const liste = doc.cat==='repas' ? ann.tickets_repas : ann.tickets_carburant;
+            // Coefficient = montantDed/montantBrut du document groupé
+            const coeff = (doc.montantBrut>0) ? (doc.montantDed/doc.montantBrut) : (6/7);
+            doc.tickets.forEach(t=>{
+              liste.push({
+                id: t.id||'t_'+Date.now()+Math.random(),
+                ref: t.ref||doc.ref,
+                montant: t.montant||0,
+                montantDed: (t.montant||0) * coeff,
+                calcul: doc.calcul||'6/7',
+                date: doc.date||new Date().toISOString().split('T')[0],
+                photo: t.photo||doc.photo||null
+              });
+            });
+            changed = true;
+            return false;
+          }
+          return true;
+        });
+      }
+    });
+  });
+  if(changed) sauvegarderDossiers();
+  if(migVersion < 2) localStorage.setItem('docfiscal_migversion','2');
+}
+
+function getAnnee(){
+  if(!dossierActif||!anneeActiveKey) return null;
+  return dossierActif.annees[anneeActiveKey]||null;
+}
+function getDocs(){
+  const a = getAnnee();
+  return a ? a.documents : [];
+}
+function getTickets(type){
+  const a = getAnnee();
+  if(!a) return [];
+  return type==='repas' ? (a.tickets_repas||[]) : (a.tickets_carburant||[]);
+}
+function estClôturee(){
+  const a = getAnnee();
+  return a ? !!a.cloture : false;
+}
+function guardCloture(){
+  if(estClôturee()){
+    showToast('🔒 Exercice clôturé — lecture seule');
+    return true;
+  }
+  return false;
+}
+
+// ═══ INIT ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  migrerDossiers();
+  if(apiKey){
+    document.getElementById('apiKeyInput').value = apiKey;
+    document.getElementById('apiStatus').innerHTML = '<span style="color:var(--green)">✓ Clé API configurée</span>';
+    document.getElementById('initialMsg').innerHTML = 'IA prête ! Scannez un document.';
+  } else {
+    document.getElementById('apiStatus').innerHTML = '<span style="color:var(--red);font-weight:700">⚠️ Clé API absente — saisissez-la ci-dessous</span>';
+    document.getElementById('initialMsg').innerHTML = '⚠️ Clé API non configurée — allez dans ⚙️ Config.';
+    const warn = document.getElementById('apiKeyWarning');
+    if(warn) warn.style.display = 'block';
+  }
+  renderDossiers();
+  renderRules();
+  renderCategories();
+  updateBackupBadge();
+  checkBackupReminder();
+  // Ouvrir dernier dossier/année actifs
+  const lastId = localStorage.getItem('docfiscal_actif');
+  const lastAnnee = localStorage.getItem('docfiscal_annee_active');
+  if(lastId){
+    const d = dossiers.find(d=>d.id===lastId);
+    if(d){
+      let annee = lastAnnee && d.annees[lastAnnee] ? lastAnnee : Object.keys(d.annees).sort().reverse()[0];
+      if(annee) ouvrirAnnee(d.id, annee, false);
+    }
+  }
+});
+
+// ═══ API KEY ════════════════════════════════════════════
+function saveApiKey(){
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if(!key.startsWith('sk-ant-')){showToast('⚠️ Clé invalide');return;}
+  apiKey = key;
+  localStorage.setItem('docfiscal_apikey', key);
+  document.getElementById('apiStatus').innerHTML = '<span style="color:var(--green)">✓ Clé sauvegardée</span>';
+  document.getElementById('initialMsg').innerHTML = 'IA prête ! Scannez un document.';
+  const warn = document.getElementById('apiKeyWarning');
+  if(warn) warn.style.display = 'none';
+  showToast('✅ Clé API sauvegardée');
+}
+
+// ═══ TABS ═══════════════════════════════════════════════
+function showTab(tab, btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+  if(tab==='scanner'){
+    const warn = document.getElementById('apiKeyWarning');
+    if(warn) warn.style.display = (localStorage.getItem('docfiscal_apikey')||'') ? 'none' : 'block';
+  }
+  if(tab==='recap') renderRecap();
+  if(tab==='documents'){ renderDocList(); renderTicketsList('repas'); renderTicketsList('carburant'); }
+  if(tab==='categories') renderCategories();
+  if(tab==='config'){ updateBackupBadge(); renderGestionExercice(); renderConfigDossiers(); }
+}
+
+// ═══ DOSSIERS (PERSONNES) ════════════════════════════════
+function creerDossier(){
+  const nom = document.getElementById('newDossierNom').value.trim();
+  const annee = (document.getElementById('newDossierAnnee').value||'').trim();
+  if(!nom){showToast('⚠️ Entrez un nom');return;}
+  if(!annee || isNaN(annee) || annee.length!==4 || parseInt(annee)<2000){showToast('⚠️ Année invalide (ex: 2026)');return;}
+  // Vérifier doublon de nom
+  if(dossiers.find(d=>d.nom.toLowerCase()===nom.toLowerCase())){
+    showToast('⚠️ Un dossier "'+nom+'" existe déjà');return;
+  }
+  const id = 'dos_'+Date.now();
+  const d = {id, nom, annees:{}, cree:new Date().toISOString()};
+  d.annees[annee] = {documents:[], cloture:false};
+  dossiers.push(d);
+  sauvegarderDossiers();
+  renderDossiers();
+  ouvrirAnnee(id, annee);
+  showToast('✅ Dossier créé: '+nom+' — '+annee);
+}
+
+function ouvrirAnnee(dossierId, annee, navigate=false){
+  const d = dossiers.find(d=>d.id===dossierId);
+  if(!d || !d.annees[annee]) return;
+  dossierActif = d;
+  anneeActiveKey = annee;
+  localStorage.setItem('docfiscal_actif', dossierId);
+  localStorage.setItem('docfiscal_annee_active', annee);
+  const locked = d.annees[annee].cloture;
+  document.getElementById('headerDossier').textContent = '👤 '+d.nom+' — '+libelleExercice(annee)+(locked?' 🔒':'');
+  // Activer sections
+  document.getElementById('scanContent').style.display = 'block';
+  document.getElementById('noScanDossier').style.display = 'none';
+  document.getElementById('docsContent').style.display = 'block';
+  document.getElementById('noDocDossier').style.display = 'none';
+  document.getElementById('recapContent').style.display = 'block';
+  document.getElementById('noRecapDossier').style.display = 'none';
+  renderDossiers();
+  renderDocList();
+  if(navigate){
+    showTab('scanner', document.querySelectorAll('nav button')[1]);
+  }
+}
+
+// Changer d'année via le dropdown inline (sans naviguer)
+function changerAnneeInline(annee){
+  if(!dossierActif || !annee) return;
+  ouvrirAnnee(dossierActif.id, annee, false);
+  // Synchroniser carte Config si elle est visible
+  renderGestionExercice();
+}
+
+// Créer un nouvel exercice depuis l'onglet Dossiers
+function creerNouvelExercice(){
+  if(!dossierActif) return;
+  const inp = document.getElementById('nouvelExerciceInput');
+  const annee = (inp.value||'').trim();
+  if(!annee||isNaN(annee)||annee.length!==4||parseInt(annee)<2000){showToast('⚠️ Année invalide (ex: 2027)');return;}
+  if(dossierActif.annees[annee]){showToast('⚠️ Exercice '+annee+' déjà existant');return;}
+  dossierActif.annees[annee] = {documents:[], cloture:false};
+  sauvegarderDossiers();
+  inp.value = '';
+  ouvrirAnnee(dossierActif.id, annee, false);
+  showToast('✅ Exercice '+libelleExercice(annee)+' créé');
+}
+
+// Suppression via Config
+let pendingDeleteDossierId = null;
+function demanderSupprimerDossier(id){
+  const d = dossiers.find(d=>d.id===id);
+  if(!d) return;
+  pendingDeleteDossierId = id;
+  document.getElementById('supprimerDossierNom').textContent = d.nom;
+  document.getElementById('supprimerDossierModal').classList.add('open');
+}
+function confirmerSupprimerDossier(){
+  if(!pendingDeleteDossierId) return;
+  const id = pendingDeleteDossierId;
+  pendingDeleteDossierId = null;
+  document.getElementById('supprimerDossierModal').classList.remove('open');
+  dossiers = dossiers.filter(d=>d.id!==id);
+  if(dossierActif && dossierActif.id===id){
+    dossierActif = null; anneeActiveKey = null;
+    document.getElementById('headerDossier').textContent = 'Aucun dossier ouvert';
+    ['scanContent','docsContent','recapContent'].forEach(id=>document.getElementById(id).style.display='none');
+    ['noScanDossier','noDocDossier','noRecapDossier'].forEach(id=>document.getElementById(id).style.display='block');
+  }
+  sauvegarderDossiers();
+  renderDossiers();
+  renderConfigDossiers();
+  showToast('🗑 Dossier supprimé');
+}
+
+function supprimerDossier(id){ demanderSupprimerDossier(id); }
+
+function sauvegarderDossiers(){
+  localStorage.setItem('docfiscal_dossiers', JSON.stringify(dossiers));
+}
+
+function renderDossiers(){
+  // Zone dossier actif
+  const zone = document.getElementById('dossierActifZone');
+  const autresEl = document.getElementById('autresDossiersList');
+
+  if(!dossierActif){
+    zone.style.display = 'none';
+    autresEl.innerHTML = dossiers.length ? '' : '<div class="empty"><div class="empty-icon">📁</div><p>Aucun dossier.<br>Créez votre premier dossier ci-dessous.</p></div>';
+    // Afficher tous les dossiers comme "autres"
+    autresEl.innerHTML = [...dossiers].reverse().map(d=>renderAutreDossierCard(d)).join('');
+    return;
+  }
+
+  // Dossier actif
+  zone.style.display = 'block';
+  document.getElementById('dossierActifNom').textContent = '👤 '+dossierActif.nom;
+  const docs = getDocs();
+  const total = docs.reduce((s,d)=>s+(d.montantDed||0),0);
+  document.getElementById('dossierActifTotal').textContent = fmt(total)+' €';
+
+  // Dropdown exercices
+  const sel = document.getElementById('anneeSelectInline');
+  const annees = Object.keys(dossierActif.annees).sort().reverse();
+  sel.innerHTML = annees.map(a=>{
+    const cloture = dossierActif.annees[a].cloture;
+    return `<option value="${a}" ${a===anneeActiveKey?'selected':''}>${libelleExercice(a)}${cloture?' 🔒':''}</option>`;
+  }).join('');
+
+  // Volets
+  const parts = Object.entries(VOLETS).map(([k,v])=>{
+    const tot = docs.filter(doc=>doc.volet===k).reduce((s,doc)=>s+(doc.montantDed||0),0);
+    return tot>0 ? `<div>${v.icon} <strong>${v.label}</strong> : <span style="color:var(--green);font-weight:700">${fmt(tot)} €</span></div>` : null;
+  }).filter(Boolean);
+  document.getElementById('dossierActifVolets').innerHTML = parts.length ? parts.join('') : '<div style="color:var(--gray);font-style:italic">Aucun document pour cet exercice</div>';
+
+  // Autres dossiers
+  const autres = [...dossiers].reverse().filter(d=>d.id!==dossierActif.id);
+  autresEl.innerHTML = autres.length
+    ? '<div style="font-size:0.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.05em;margin:8px 0 6px">Autres dossiers</div>' +
+      autres.map(d=>renderAutreDossierCard(d)).join('')
+    : '';
+}
+
+function renderAutreDossierCard(d){
+  const annees = Object.keys(d.annees).sort().reverse();
+  const total = annees.reduce((s,a)=>s+d.annees[a].documents.reduce((s2,doc)=>s2+(doc.montantDed||0),0),0);
+  const nbDocs = annees.reduce((s,a)=>s+d.annees[a].documents.length,0);
+  return `<div class="dossier-item" style="flex-direction:column;align-items:stretch;cursor:default">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-weight:700">👤 ${d.nom}</div>
+        <div style="font-size:0.73rem;color:var(--gray)">${annees.length} exercice(s) · ${nbDocs} document(s)</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="text-align:right">
+          <div style="font-weight:700;color:var(--green);font-size:0.9rem">${fmt(total)} €</div>
+        </div>
+        <button class="btn-small btn-small-gold" onclick="ouvrirDossier('${d.id}')">Ouvrir</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// Ouvre le dossier sur son exercice le plus récent
+function ouvrirDossier(id){
+  const d = dossiers.find(d=>d.id===id);
+  if(!d) return;
+  const annee = Object.keys(d.annees).sort().reverse()[0];
+  if(annee) ouvrirAnnee(id, annee);
+}
+
+// ═══ SÉLECTEUR D'ANNÉE ═══════════════════════════════════
+// ═══ CLÔTURE / RÉOUVERTURE ═══════════════════════════════
+function demanderCloture(){
+  if(!dossierActif||!anneeActiveKey) return;
+  if(estClôturee()){showToast('🔒 Déjà clôturé');return;}
+  if(!getDocs().length){showToast('⚠️ Aucun document à clôturer');return;}
+  document.getElementById('clotureAnneeLabel').textContent = anneeActiveKey;
+  document.getElementById('clotureNomLabel').textContent = dossierActif.nom;
+  document.getElementById('clotureModal').classList.add('open');
+}
+function confirmerCloture(){
+  const a = getAnnee();
+  if(!a) return;
+  a.cloture = true;
+  sauvegarderDossiers();
+  document.getElementById('clotureModal').classList.remove('open');
+  document.getElementById('headerDossier').textContent = '👤 '+dossierActif.nom+' — '+libelleExercice(anneeActiveKey)+' 🔒';
+  renderRecap();
+  renderDocList();
+  renderDossiers();
+  renderGestionExercice();
+  showToast('🔒 Exercice '+anneeActiveKey+' clôturé');
+}
+function demanderReouverture(){
+  if(!dossierActif||!anneeActiveKey) return;
+  document.getElementById('reouvAnneeLabel').textContent = anneeActiveKey;
+  document.getElementById('reouvNomLabel').textContent = dossierActif.nom;
+  document.getElementById('reouvertureModal').classList.add('open');
+}
+function confirmerReouverture(){
+  const a = getAnnee();
+  if(!a) return;
+  a.cloture = false;
+  sauvegarderDossiers();
+  document.getElementById('reouvertureModal').classList.remove('open');
+  document.getElementById('headerDossier').textContent = '👤 '+dossierActif.nom+' — '+libelleExercice(anneeActiveKey);
+  renderRecap();
+  renderDocList();
+  renderDossiers();
+  renderGestionExercice();
+  showToast('🔓 Exercice '+anneeActiveKey+' rouvert');
+}
+
+// ═══ RESET EXERCICE ══════════════════════════════════════
+function renderGestionExercice(){
+  const card = document.getElementById('cardGestionExercice');
+  if(!dossierActif || !anneeActiveKey){ card.style.display='none'; return; }
+  card.style.display = 'block';
+  const locked = estClôturee();
+  document.getElementById('gestionAnneeLabel').textContent = libelleExercice(anneeActiveKey);
+  document.getElementById('gestionAnneeLabel2').textContent = libelleExercice(anneeActiveKey);
+  document.getElementById('gestionNomLabel').textContent = dossierActif.nom;
+  document.getElementById('gestionClotureBanner').style.display = locked ? 'flex' : 'none';
+  document.getElementById('btnCloturer').style.display = locked ? 'none' : 'block';
+  document.getElementById('btnReouvrir').style.display = locked ? 'block' : 'none';
+  document.getElementById('btnResetExercice').style.display = locked ? 'none' : 'block';
+}
+
+function demanderResetExercice(){
+  if(!dossierActif||!anneeActiveKey) return;
+  if(guardCloture()) return;
+  const docs = getDocs();
+  if(!docs.length){showToast('⚠️ Cet exercice est déjà vide');return;}
+  document.getElementById('resetCount').textContent = docs.length;
+  document.getElementById('resetAnneeLabel').textContent = anneeActiveKey;
+  document.getElementById('resetNomLabel').textContent = dossierActif.nom;
+  document.getElementById('resetModal').classList.add('open');
+}
+function confirmerResetExercice(){
+  const a = getAnnee();
+  if(!a) return;
+  a.documents = [];
+  sauvegarderDossiers();
+  document.getElementById('resetModal').classList.remove('open');
+  renderRecap();
+  renderDocList();
+  renderDossiers();
+  renderGestionExercice();
+  showToast('🗑 Exercice '+anneeActiveKey+' réinitialisé');
+}
+
+// ═══ CAPTURE ════════════════════════════════════════════
+function handleCapture(e){
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async(ev) => {
+    currentImageData = ev.target.result;
+    const img = document.getElementById('imgPreview');
+    img.src = currentImageData; img.style.display = 'block';
+    document.getElementById('aiZone').style.display = 'block';
+    document.getElementById('initialState').style.display = 'none';
+    document.getElementById('manualForm').style.display = 'none';
+    document.getElementById('aiResultBox').style.display = 'none';
+    if(apiKey){ await analyzeWithAI(currentImageData); }
+    else{ initManualForm(); showToast('⚠️ Configurez votre clé API'); }
+  };
+  reader.readAsDataURL(file); e.target.value = '';
+}
+
+// ═══ ANALYSE IA ═════════════════════════════════════════
+async function analyzeWithAI(imageData){
+  document.getElementById('analyzingBox').style.display = 'block';
+  document.getElementById('aiResultBox').style.display = 'none';
+
+  const prompt = `Tu es un expert-comptable fiscal belge spécialisé IPP pour administrateurs indépendants.
+
+VOLETS FISCAUX DISPONIBLES:
+- frais: Frais réels professionnels
+- assurances: Assurances (primes payées)
+- officiels: Documents officiels (fiches, cotisations)
+
+CATÉGORIES FRAIS: carburant, vehicule, repas, representation, telephone, bureau, cotisation, avocat, frais_divers
+CATÉGORIES ASSURANCES: pcli, ep, rc_pro, srd, hospi, assur_autre
+CATÉGORIES OFFICIELS: fiche281, cotis_inasti, aer, va, doc_autre
+
+RÈGLES CRITIQUES pour extraire le BON montant:
+- ASSURANCES: prendre la PRIME ANNUELLE payée (PAS le capital garanti/assuré/en cas de décès)
+- CARBURANT: prendre le TOTAL TVAC de la facture/ticket
+- RESTAURANT: prendre le TOTAL TVAC de l'addition (PAS le montant HTVA)
+- FICHE 281: prendre le montant de la rémunération brute imposable
+- COTISATIONS INASTI/UCM: prendre le montant total de la cotisation
+- Toujours TTC/TVAC sauf document sans TVA
+
+Réponds UNIQUEMENT en JSON:
+{
+  "volet": "frais|assurances|officiels",
+  "categorie": "code_categorie",
+  "reference": "référence courte max 40 chars",
+  "montant_brut": 0.00,
+  "montant_detail": "quel montant pris et pourquoi",
+  "confiance": "haute|moyenne|basse",
+  "question": null
+}`;
+
+  try{
+    const base64 = imageData.split(',')[1];
+    const mediaType = imageData.split(';')[0].split(':')[1];
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:400,messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:mediaType,data:base64}},
+        {type:'text',text:prompt}
+      ]}]})
+    });
+    if(!resp.ok) throw new Error(await resp.text());
+    const data = await resp.json();
+    const text = data.content[0].text.trim();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('No JSON');
+    const result = JSON.parse(jsonMatch[0]);
+
+    document.getElementById('analyzingBox').style.display = 'none';
+    document.getElementById('aiResultBox').style.display = 'block';
+
+    aiSuggestion = result;
+    const voletDef = VOLETS[result.volet]||VOLETS.frais;
+    const catDef = voletDef.cats[result.categorie]||{label:'Inconnu',coeff:1,desc:'×100%',opts:null};
+    const brut = result.montant_brut||0;
+    const deductible = brut * catDef.coeff;
+    aiSuggestion._catDef = catDef;
+    aiSuggestion._deductible = deductible;
+
+    document.getElementById('aiVolet').textContent = voletDef.icon+' '+voletDef.label;
+    document.getElementById('aiCat').textContent = catDef.label;
+    document.getElementById('aiRef').textContent = result.reference||'—';
+    document.getElementById('aiType').textContent = result.montant_detail||'—';
+
+    const confEl = document.getElementById('aiConfidence');
+    const confMap = {'haute':['confidence-high','✓ Haute'],'moyenne':['confidence-medium','~ Moyenne'],'basse':['confidence-low','⚠ Basse']};
+    const conf = confMap[result.confiance]||['confidence-medium',result.confiance];
+    confEl.className = 'ai-confidence '+conf[0]; confEl.textContent = conf[1];
+
+    if(result.question){ document.getElementById('aiQuestion').style.display='block'; document.getElementById('aiQuestion').textContent='❓ '+result.question; }
+    else { document.getElementById('aiQuestion').style.display='none'; }
+
+    // Garde-fou : montant à 0 ou suspect (>5000€)
+    const warnEl = document.getElementById('aiMontantWarning');
+    if(brut<=0){
+      warnEl.style.display='block';
+      warnEl.innerHTML = '⚠️ Montant non détecté (0 €). Vérifiez le montant ci-dessous avant de confirmer, ou utilisez "Modifier manuellement".';
+    } else if(brut>5000){
+      warnEl.style.display='block';
+      warnEl.innerHTML = '⚠️ Montant élevé ('+fmt(brut)+' €) — vérifiez qu\'il s\'agit bien du bon montant avant de confirmer.';
+    } else {
+      warnEl.style.display='none';
+    }
+
+    renderCalcul(brut, catDef, aiSuggestion);
+
+  }catch(err){
+    document.getElementById('analyzingBox').style.display = 'none';
+    console.error('AI Error:', err);
+    showToast('⚠️ Erreur IA — encodage manuel');
+    initManualForm();
+  }
+}
+
+// ═══ CALCUL ═════════════════════════════════════════════
+function renderCalcul(brut, catDef, suggestion){
+  document.getElementById('lbl1').textContent = 'Montant brut ('+catDef.label+')';
+  document.getElementById('val1').textContent = fmt(brut)+' €';
+
+  const coeff = suggestion._currentCoeff !== undefined ? suggestion._currentCoeff : catDef.coeff;
+
+  if(coeff === 1){
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step3').style.display = 'none';
+  } else if(catDef.desc.includes('×75%') || catDef.desc.includes('×6/7×75%')){
+    const c1 = suggestion._c1 || 6/7;
+    document.getElementById('step2').style.display = 'flex';
+    document.getElementById('lbl2').textContent = '× coefficient ('+fmtCoeff(c1)+')';
+    document.getElementById('val2').textContent = fmt(brut*c1)+' €';
+    document.getElementById('step3').style.display = 'flex';
+    document.getElementById('lbl3').textContent = '× 75% professionnel';
+    document.getElementById('val3').textContent = fmt(brut*c1*0.75)+' €';
+  } else {
+    document.getElementById('step2').style.display = 'flex';
+    document.getElementById('lbl2').textContent = '× coefficient ('+fmtCoeff(coeff)+')';
+    document.getElementById('val2').textContent = fmt(brut*coeff)+' €';
+    document.getElementById('step3').style.display = 'none';
+  }
+
+  const ded = brut * coeff;
+  suggestion._deductible = ded;
+  document.getElementById('valFinal').textContent = fmt(ded)+' €';
+
+  if(catDef.opts){
+    document.getElementById('coeffZone').style.display = 'block';
+    document.getElementById('coeffButtons').innerHTML = catDef.opts.map(opt=>
+      '<button class="coeff-btn" onclick="applyCoeff(\''+opt+'\')">'+ opt+'</button>'
+    ).join('');
+  } else {
+    document.getElementById('coeffZone').style.display = 'none';
+  }
+}
+
+function applyCoeff(opt){
+  if(!aiSuggestion) return;
+  const brut = aiSuggestion.montant_brut||0;
+  let coeff;
+  if(opt==='6/7×75%'){coeff=6/7*0.75; aiSuggestion._c1=6/7;}
+  else if(opt==='5/7×75%'){coeff=5/7*0.75; aiSuggestion._c1=5/7;}
+  else if(opt==='6/7'){coeff=6/7; aiSuggestion._c1=6/7;}
+  else if(opt==='5/7'){coeff=5/7; aiSuggestion._c1=5/7;}
+  else if(opt==='6/7×100%'){coeff=6/7; aiSuggestion._c1=6/7;}
+  else coeff=parseFloat(opt)/100||1;
+  aiSuggestion._currentCoeff = coeff;
+  renderCalcul(brut, aiSuggestion._catDef, aiSuggestion);
+  document.querySelectorAll('.coeff-btn').forEach(b=>b.classList.toggle('active',b.textContent===opt));
+}
+
+function fmtCoeff(c){
+  if(Math.abs(c-6/7)<0.001) return '6/7';
+  if(Math.abs(c-5/7)<0.001) return '5/7';
+  if(Math.abs(c-6/7*0.75)<0.001) return '6/7×75%';
+  if(Math.abs(c-5/7*0.75)<0.001) return '5/7×75%';
+  return Math.round(c*100)+'%';
+}
+
+// ═══ DÉTECTION DOUBLONS ══════════════════════════════════
+let pendingDoc = null; // doc en attente de confirmation doublon
+
+function verifierDoublon(doc, callback){
+  if(!dossierActif) return callback(true);
+  const doublon = getDocs().find(d =>
+    Math.abs((d.montantBrut||0) - doc.montantBrut) < 0.01 && d.id !== doc.id
+  );
+  if(!doublon){
+    callback(true);
+    return;
+  }
+  // Afficher modal doublon
+  pendingDoc = {doc, callback};
+  document.getElementById('doublonMontant').textContent = fmt(doc.montantBrut)+' €';
+  document.getElementById('doublonRef1').textContent = doublon.ref;
+  document.getElementById('doublonDate1').textContent = doublon.date ? new Date(doublon.date).toLocaleDateString('fr-BE') : '—';
+  document.getElementById('doublonRef2').textContent = doc.ref;
+  document.getElementById('doublonDate2').textContent = doc.date ? new Date(doc.date).toLocaleDateString('fr-BE') : '—';
+  document.getElementById('doublonModal').classList.add('open');
+}
+
+function doublonGarderLesDeuxl(){
+  document.getElementById('doublonModal').classList.remove('open');
+  if(pendingDoc){ pendingDoc.callback(true); pendingDoc = null; }
+}
+
+function doublonGarderUn(){
+  document.getElementById('doublonModal').classList.remove('open');
+  if(pendingDoc){ pendingDoc.callback(false); pendingDoc = null; }
+}
+
+// ═══ CONFIRMER ══════════════════════════════════════════
+function confirmAI(){
+  if(!aiSuggestion || !dossierActif) return;
+  if(guardCloture()) return;
+  const catDef = aiSuggestion._catDef||{label:'',desc:'×100%'};
+  const brut = aiSuggestion.montant_brut||0;
+  const ded = aiSuggestion._deductible||brut;
+  const volet = aiSuggestion.volet||'frais';
+  const cat = aiSuggestion.categorie||'frais_divers';
+  const doc = {
+    id:'doc_'+Date.now(),
+    volet, cat,
+    ref: aiSuggestion.reference||'Document scanné',
+    montantBrut: brut, montantDed: ded,
+    calcul: catDef.desc||'×100%',
+    libelle: catDef.libelle||'',
+    date: new Date().toISOString().split('T')[0],
+    note: '', aiClassified: true
+  };
+  const enregistrer = async ()=>{
+    // Sauvegarder une copie compressée pour tous les documents
+    if(currentImageData){
+      doc.photo = await compresserImage(currentImageData);
+    }
+    verifierDoublon(doc, (ok)=>{
+      if(!ok) return;
+      getDocs().push(doc);
+      sauvegarderDossiers();
+      resetScanner();
+      renderDocList();
+      showToast('✅ Enregistré — Déductible: '+fmt(ded)+' €');
+    });
+  };
+  enregistrer();
+}
+
+// ═══ MANUEL ═════════════════════════════════════════════
+function initManualForm(){
+  document.getElementById('manualForm').style.display = 'block';
+  document.getElementById('aiResultBox').style.display = 'none';
+  document.getElementById('analyzingBox').style.display = 'none';
+  if(aiSuggestion){
+    document.getElementById('manVolet').value = aiSuggestion.volet||'frais';
+    updateManualCats();
+    document.getElementById('manCat').value = aiSuggestion.categorie||'';
+    document.getElementById('manRef').value = aiSuggestion.reference||'';
+    document.getElementById('manBrut').value = aiSuggestion.montant_brut||'';
+  } else {
+    updateManualCats();
+  }
+  document.getElementById('manDate').value = new Date().toISOString().split('T')[0];
+  updateManualCalc();
+}
+
+function showManualForm(){ initManualForm(); }
+
+function updateManualCats(){
+  const volet = document.getElementById('manVolet').value;
+  const voletDef = VOLETS[volet]||VOLETS.frais;
+  const sel = document.getElementById('manCat');
+  sel.innerHTML = Object.entries(voletDef.cats).map(([k,v])=>'<option value="'+k+'">'+v.label+'</option>').join('');
+  updateManualCalc();
+}
+
+function updateManualCalc(){
+  const brut = parseFloat(document.getElementById('manBrut').value)||0;
+  const coeff = parseFloat(document.getElementById('manCoeff').value)||1;
+  const ded = brut*coeff;
+  document.getElementById('manResult').textContent = fmt(ded)+' € ('+fmtCoeff(coeff)+' de '+fmt(brut)+' €)';
+}
+
+function saveManual(){
+  if(!dossierActif){showToast('⚠️ Ouvrez un dossier');return;}
+  if(guardCloture()) return;
+  const volet = document.getElementById('manVolet').value;
+  const cat = document.getElementById('manCat').value;
+  const ref = document.getElementById('manRef').value.trim();
+  const brut = parseFloat(document.getElementById('manBrut').value);
+  const coeff = parseFloat(document.getElementById('manCoeff').value)||1;
+  const date = document.getElementById('manDate').value;
+  const note = document.getElementById('manNote').value.trim();
+  if(!ref){showToast('⚠️ Ajoutez une référence');return;}
+  if(isNaN(brut)||brut<=0){showToast('⚠️ Montant invalide');return;}
+  const voletDef = VOLETS[volet]||VOLETS.frais;
+  const catDef = voletDef.cats[cat]||{label:cat,libelle:cat,desc:'×100%'};
+  const doc = {
+    id:'doc_'+Date.now(), volet, cat, ref,
+    montantBrut:brut, montantDed:brut*coeff,
+    calcul:fmtCoeff(coeff), libelle:catDef.libelle,
+    date, note, aiClassified:false
+  };
+  verifierDoublon(doc, (ok)=>{
+    if(!ok) return;
+    getDocs().push(doc);
+    sauvegarderDossiers();
+    resetScanner();
+    renderDocList();
+    showToast('✅ Enregistré — '+fmt(brut*coeff)+' €');
+  });
+}
+
+function resetScanner(){
+  currentImageData=null; aiSuggestion=null;
+  document.getElementById('aiZone').style.display='none';
+  document.getElementById('initialState').style.display='block';
+  document.getElementById('imgPreview').style.display='none';
+  document.getElementById('manualForm').style.display='none';
+  document.getElementById('aiResultBox').style.display='none';
+  document.getElementById('analyzingBox').style.display='none';
+}
+
+// Relance l'analyse IA sur la même image (sans re-scanner)
+async function recommencerScan(){
+  if(!currentImageData){showToast('⚠️ Aucune image à ré-analyser');return;}
+  if(!apiKey){initManualForm();return;}
+  document.getElementById('aiResultBox').style.display='none';
+  await analyzeWithAI(currentImageData);
+  showToast('🔄 Nouvelle analyse effectuée');
+}
+
+// ═══ SESSION GROUPÉE ═════════════════════════════════════
+let sessionActive = null;
+
+function ouvrirSession(type){
+  if(!dossierActif){showToast('⚠️ Ouvrez un dossier');return;}
+  if(guardCloture()) return;
+  const config = {
+    repas:    {label:'Session Restaurations', color:'linear-gradient(135deg,#e07b39,#c9a84c)', coeff:6/7,      coeffOpts:['6/7','5/7','100%'],         cat:'repas',     volet:'frais'},
+    carburant:{label:'Session Carburant',     color:'linear-gradient(135deg,#1a5fa8,#2d9c8a)', coeff:6/7*0.75, coeffOpts:['6/7×75%','5/7×75%','6/7×100%'], cat:'carburant', volet:'frais'},
+  };
+  sessionActive = {type, tickets:[], coeff:config[type].coeff, config:config[type]};
+  document.getElementById('sessionBox').style.background = config[type].color;
+  document.getElementById('sessionTitle').textContent = config[type].label;
+  document.getElementById('sessionTypeLabel').textContent = type==='repas'?'🍽️ Restaurants':'⛽ Carburant';
+  document.getElementById('sessionCoeffDisplay').textContent = fmtCoeff(config[type].coeff);
+  document.getElementById('sessionCoeffBtns').innerHTML = config[type].coeffOpts.map(opt=>
+    '<button onclick="setSessionCoeff(this.textContent)" style="padding:5px 10px;background:rgba(255,255,255,0.12);border:none;color:white;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer">'+opt+'</button>'
+  ).join('');
+  document.getElementById('sessionZone').style.display = 'block';
+  document.getElementById('initialState').style.display = 'none';
+  document.getElementById('aiZone').style.display = 'none';
+  updateSessionUI();
+}
+
+function setSessionCoeff(opt){
+  if(!sessionActive) return;
+  sessionActive.coeff = parseCoeffOpt(opt);
+  document.getElementById('sessionCoeffDisplay').textContent = opt;
+  document.getElementById('sessionCoeffBtns').querySelectorAll('button').forEach(b=>{
+    b.style.background = 'rgba(255,255,255,'+(b.textContent===opt?'0.35':'0.12')+')';
+  });
+  updateSessionUI();
+}
+
+function parseCoeffOpt(opt){
+  if(opt==='6/7') return 6/7;
+  if(opt==='5/7') return 5/7;
+  if(opt==='6/7×75%') return 6/7*0.75;
+  if(opt==='5/7×75%') return 5/7*0.75;
+  if(opt==='6/7×100%') return 6/7;
+  if(opt==='100%') return 1;
+  if(opt==='75%') return 0.75;
+  if(opt==='50%') return 0.5;
+  return parseFloat(opt)/100||1;
+}
+
+async function handleSessionCapture(e){
+  const file = e.target.files[0]; if(!file||!sessionActive) return;
+  document.getElementById('sessionAnalyzing').style.display = 'block';
+  // Recharger la clé API depuis localStorage à chaque scan
+  const key = localStorage.getItem('docfiscal_apikey')||'';
+  const reader = new FileReader();
+  reader.onload = async(ev) => {
+    const imageData = ev.target.result;
+    if(!key){
+      document.getElementById('sessionAnalyzing').style.display = 'none';
+      showToast('⚠️ Clé API non configurée — allez dans Config');
+      return;
+    }
+    try{
+      const base64 = imageData.split(',')[1];
+      const mediaType = imageData.split(';')[0].split(':')[1];
+      const type = sessionActive.type;
+      const prompt_txt = `Tu es un expert-comptable fiscal belge.
+Analyse cette image de ticket(s) de ${type==='repas'?'restaurant/repas':'carburant'}.
+Il peut y avoir UN ou PLUSIEURS tickets sur l'image.
+Pour chaque ticket visible, extrais:
+- Le montant TOTAL TTC/TVAC (pas HTVA)
+- Une référence courte (nom établissement ou station, date si visible)
+
+Réponds UNIQUEMENT en JSON:
+{"tickets":[{"montant":0.00,"ref":"nom court"},{"montant":0.00,"ref":"nom court"}]}
+Si un seul ticket: {"tickets":[{"montant":0.00,"ref":"ref"}]}`;
+
+      const resp = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:400,messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mediaType,data:base64}},
+          {type:'text',text:prompt_txt}
+        ]}]})
+      });
+      if(!resp.ok) throw new Error('API '+resp.status+': '+await resp.text());
+      const data = await resp.json();
+      const text = data.content[0].text.trim();
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if(!jsonMatch) throw new Error('Pas de JSON dans: '+text.slice(0,80));
+      const result = JSON.parse(jsonMatch[0]);
+      const tickets = result.tickets||[];
+      let nb = 0;
+      tickets.forEach(t=>{
+        if(t.montant>0){
+          sessionActive.tickets.push({montant:t.montant, ref:t.ref||'Ticket', id:'t_'+Date.now()+Math.random()});
+          nb++;
+        }
+      });
+      if(nb===0){
+        // Aucun ticket lu — ajouter un ticket à corriger
+        sessionActive.tickets.push({montant:0, ref:'⚠️ Non lu — corrigez', id:'t_'+Date.now(), douteux:true});
+        showToast('⚠️ Aucun ticket détecté — corrigez manuellement');
+      } else {
+        showToast('✅ '+nb+' ticket(s) détecté(s)');
+      }
+    }catch(err){
+      console.error('Session error:', err);
+      showToast('⚠️ Erreur: '+err.message.slice(0,60));
+    }
+    document.getElementById('sessionAnalyzing').style.display = 'none';
+    updateSessionUI();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function updateSessionUI(){
+  if(!sessionActive) return;
+  const tickets = sessionActive.tickets;
+  const validTickets = tickets.filter(t=>!t.douteux && t.montant>0);
+  const douteuxCount = tickets.length - validTickets.length;
+  const totalBrut = validTickets.reduce((s,t)=>s+(t.montant||0),0);
+  const totalDed = totalBrut * sessionActive.coeff;
+  document.getElementById('sessionCount').textContent =
+    validTickets.length+' valide(s)'+(douteuxCount>0?' · ⚠️ '+douteuxCount+' à corriger':'')+' · '+fmtCoeff(sessionActive.coeff);
+  document.getElementById('sessionTotal').textContent = fmt(totalBrut)+' €';
+  document.getElementById('sessionDed').textContent = 'Déductible: '+fmt(totalDed)+' €';
+  const listEl = document.getElementById('sessionTicketsList');
+  if(!tickets.length){
+    listEl.innerHTML = '<div style="text-align:center;padding:10px;font-size:0.8rem;opacity:0.6">Aucun ticket — scannez le premier</div>';
+  } else {
+    listEl.innerHTML = tickets.map(t=>{
+      const rouge = !!t.douteux;
+      const bg = rouge ? 'rgba(220,50,50,0.25)' : 'rgba(255,255,255,0.08)';
+      const border = rouge ? '1px solid rgba(255,100,100,0.5)' : 'none';
+      return '<div style="background:'+bg+';border:'+border+';border-radius:8px;margin-bottom:5px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px">'+
+        '<div style="font-size:0.78rem;flex:1;margin-right:8px;'+(rouge?'color:#ffaaaa':'')+'">'+t.ref+'</div>'+
+        '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">'+
+        '<span style="font-weight:700;font-size:0.88rem;'+(rouge?'color:#ffaaaa':'')+'">'+( t.montant>0 ? fmt(t.montant)+' €' : '—' )+'</span>'+
+        (rouge ? '<button onclick="corrigerTicket(\''+t.id+'\')" style="background:rgba(255,200,50,0.4);border:none;color:white;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:0.72rem">✏️</button>' : '')+
+        '<button onclick="supprimerTicket(\"'+t.id+'\")" style="background:rgba(255,50,50,0.4);border:none;color:white;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:0.75rem">✕</button>'+
+        '</div></div>'+
+        (rouge ? '<div id="corrZone_'+t.id+'" style="display:none;padding:0 8px 8px">'+
+          '<input id="corrRef_'+t.id+'" type="text" placeholder="Établissement / date" style="width:100%;margin-bottom:4px;padding:6px;border-radius:6px;border:none;font-size:0.8rem;box-sizing:border-box">'+
+          '<div style="display:flex;gap:6px">'+
+          '<input id="corrMnt_'+t.id+'" type="number" placeholder="Montant €" step="0.01" style="flex:1;padding:6px;border-radius:6px;border:none;font-size:0.8rem">'+
+          '<button onclick="validerCorrection(\''+t.id+'\')" style="padding:6px 12px;background:#2d7a4f;border:none;color:white;border-radius:6px;font-weight:700;cursor:pointer">✓</button>'+
+          '</div></div>' : '')+
+        '</div>';
+    }).join('');
+  }
+  const btn = document.getElementById('sessionClotureBtn');
+  const actif = tickets.length > 0;
+  btn.disabled = !actif;
+  btn.style.opacity = actif ? '1' : '0.4';
+  btn.style.cursor = actif ? 'pointer' : 'default';
+  btn.textContent = actif ? '✓ Clôturer et enregistrer ('+tickets.length+' tickets)' : '✓ Clôturer et enregistrer';
+}
+
+function supprimerTicket(id){
+  if(!sessionActive) return;
+  sessionActive.tickets = sessionActive.tickets.filter(t=>t.id!==id);
+  updateSessionUI();
+}
+
+function corrigerTicket(id){
+  const zone = document.getElementById('corrZone_'+id);
+  if(zone) zone.style.display = zone.style.display==='none' ? 'block' : 'none';
+}
+
+function validerCorrection(id){
+  if(!sessionActive) return;
+  const t = sessionActive.tickets.find(t=>t.id===id);
+  if(!t) return;
+  const ref = (document.getElementById('corrRef_'+id)?.value||'').trim();
+  const montant = parseFloat(document.getElementById('corrMnt_'+id)?.value||'0');
+  if(!ref){showToast('⚠️ Ajoutez une référence');return;}
+  if(!montant||montant<=0){showToast('⚠️ Montant invalide');return;}
+  t.ref = ref; t.montant = montant; t.douteux = false;
+  updateSessionUI();
+  showToast('✅ Ticket corrigé');
+}
+
+function ajouterTicketManuel(){
+  if(!sessionActive) return;
+  const id = 't_'+Date.now();
+  sessionActive.tickets.push({montant:0, ref:'⚠️ À compléter', id, douteux:true});
+  updateSessionUI();
+  setTimeout(()=>corrigerTicket(id), 100);
+}
+
+function cloturerSession(){
+  if(!sessionActive || !dossierActif || !sessionActive.tickets.length) return;
+  if(guardCloture()) return;
+  const tickets = sessionActive.tickets.filter(t=>!t.douteux && t.montant>0);
+  if(!tickets.length){showToast('⚠️ Aucun ticket valide — corrigez les tickets rouges');return;}
+  const type = sessionActive.type; // 'repas' ou 'carburant'
+  const coeff = sessionActive.coeff;
+  const calcul = fmtCoeff(coeff);
+  const label = type==='repas'?'Restaurations':'Carburant';
+  const liste = type==='repas' ? getAnnee().tickets_repas : getAnnee().tickets_carburant;
+  const date = new Date().toISOString().split('T')[0];
+  // Ajouter chaque ticket individuellement
+  tickets.forEach(t=>{
+    liste.push({
+      id: 't_'+Date.now()+Math.random(),
+      ref: t.ref||'Ticket',
+      montant: t.montant,
+      montantDed: t.montant * coeff,
+      calcul,
+      date,
+      photo: t.photo||null
+    });
+  });
+  sauvegarderDossiers();
+  renderDocList();
+  fermerSession();
+  const totalDed = tickets.reduce((s,t)=>s+t.montant,0)*coeff;
+  showToast('✅ '+label+' — '+tickets.length+' ticket(s) — '+fmt(totalDed)+' € déductibles');
+}
+
+function fermerSession(){
+  sessionActive = null;
+  document.getElementById('sessionZone').style.display = 'none';
+  document.getElementById('initialState').style.display = 'block';
+}
+
+// Impression listing tickets détaillé
+function imprimerListingTickets(docId){
+  if(!dossierActif) return;
+  const doc = getDocs().find(d=>d.id===docId);
+  if(!doc || !doc.tickets || !doc.tickets.length){
+    showToast('⚠️ Aucun détail de tickets disponible');
+    return;
+  }
+  const now = new Date();
+  let rows = doc.tickets.map((t,i)=>
+    '<tr><td style="padding:7px 12px;color:#666">'+(i+1)+'</td>' +
+    '<td style="padding:7px 12px">'+t.ref+'</td>' +
+    '<td style="padding:7px 12px;text-align:right;font-weight:600">'+fmt(t.montant)+' €</td></tr>'
+  ).join('');
+  const totalBrut = doc.tickets.reduce((s,t)=>s+t.montant,0);
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>body{font-family:Arial,sans-serif;margin:30px;color:#0f1f3d}h1{font-size:1.2em}table{width:100%;border-collapse:collapse;margin-top:16px}th{padding:8px 12px;text-align:left;border-bottom:2px solid #0f1f3d;font-size:0.82em;color:#666}th:last-child{text-align:right}.total td{padding:10px 12px;font-weight:700;background:#0f1f3d;color:white}.total td:last-child{text-align:right;color:#e8c97a}tr:nth-child(even){background:#f9f9f9}</style>
+  </head><body>
+  <p style="font-weight:700">${dossierActif.nom} — ${libelleExercice(anneeActiveKey)}</p>
+  <h1>Listing détaillé — ${doc.ref}</h1>
+  <p style="font-size:0.82em;color:#666">Coefficient appliqué: ${doc.calcul} · Imprimé le ${now.toLocaleDateString('fr-BE',{day:'numeric',month:'long',year:'numeric'})}</p>
+  <table>
+    <thead><tr><th>#</th><th>Établissement / Référence</th><th style="text-align:right">Montant TTC</th></tr></thead>
+    <tbody>${rows}
+    <tr class="total"><td colspan="2">TOTAL BRUT (${doc.tickets.length} tickets)</td><td>${fmt(totalBrut)} €</td></tr>
+    <tr style="background:#e8f4e8"><td colspan="2" style="padding:8px 12px;font-weight:700;color:#2d7a4f">MONTANT DÉDUCTIBLE (${doc.calcul})</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:#2d7a4f">${fmt(doc.montantDed)} €</td></tr>
+    </tbody>
+  </table>
+  </body></html>`;
+  ouvrirDocumentExport(html, 'Listing_'+doc.ref.replace(/[^a-zA-Z0-9]+/g,'_')+'.html');
+}
+function renderDocList(){
+  if(!dossierActif) return;
+  let docs = [...getDocs()];
+  const locked = estClôturee();
+  document.getElementById('docCount').textContent = docs.length;
+  const list = document.getElementById('docList');
+  if(!docs.length){list.innerHTML='<div class="empty"><div class="empty-icon">📂</div><p>Aucun document.</p></div>';return;}
+
+  // Recherche
+  const search = (document.getElementById('docSearch')?.value||'').trim().toLowerCase();
+  if(search){
+    docs = docs.filter(d =>
+      (d.ref||'').toLowerCase().includes(search) ||
+      (d.note||'').toLowerCase().includes(search) ||
+      (d.libelle||'').toLowerCase().includes(search)
+    );
+  }
+
+  // Tri
+  const sort = document.getElementById('docSort')?.value||'recent';
+  if(sort==='recent'){ docs.reverse(); }
+  else if(sort==='date_desc'){ docs.sort((a,b)=>(b.date||'').localeCompare(a.date||'')); }
+  else if(sort==='date_asc'){ docs.sort((a,b)=>(a.date||'').localeCompare(b.date||'')); }
+  else if(sort==='montant_desc'){ docs.sort((a,b)=>(b.montantDed||0)-(a.montantDed||0)); }
+  else if(sort==='montant_asc'){ docs.sort((a,b)=>(a.montantDed||0)-(b.montantDed||0)); }
+
+  if(!docs.length){
+    list.innerHTML = (locked?'<div class="cloture-banner"><span class="icon">🔒</span><div><strong>Exercice clôturé</strong><br><span style="color:var(--gray);font-size:0.78rem">Consultation uniquement — aucune modification possible.</span></div></div>':'') +
+      '<div class="empty"><div class="empty-icon">🔎</div><p>Aucun résultat pour cette recherche.</p></div>';
+    return;
+  }
+
+  list.innerHTML = (locked?'<div class="cloture-banner"><span class="icon">🔒</span><div><strong>Exercice clôturé</strong><br><span style="color:var(--gray);font-size:0.78rem">Consultation uniquement — aucune modification possible.</span></div></div>':'') +
+  docs.map(d=>{
+    const voletDef = VOLETS[d.volet]||VOLETS.frais;
+    const catDef = voletDef.cats[d.cat]||{label:d.cat};
+    const hasTickets = d.tickets && d.tickets.length > 0;
+    return `<div class="doc-item" onclick="openEditModal('${d.id}')">
+      <div class="doc-icon" style="background:${voletDef.color}22">${voletDef.icon}</div>
+      <div class="doc-info">
+        <div class="doc-name">${d.ref}${d.aiClassified?' 🤖':''}</div>
+        <div class="doc-meta">${catDef.label} · ${d.date?new Date(d.date).toLocaleDateString('fr-BE'):''}${d.note?' · '+d.note:''}</div>
+        <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
+        ${hasTickets?'<button onclick="event.stopPropagation();imprimerListingTickets(\''+d.id+'\')" style="background:var(--light);border:none;border-radius:6px;padding:3px 10px;font-size:0.68rem;font-weight:600;color:var(--navy);cursor:pointer">🖨️ Listing tickets</button>':''}
+        ${!locked?'<button onclick="event.stopPropagation();dupliquerDoc(\''+d.id+'\')" style="background:var(--light);border:none;border-radius:6px;padding:3px 10px;font-size:0.68rem;font-weight:600;color:var(--navy);cursor:pointer">📋 Dupliquer</button>':''}
+        </div>
+      </div>
+      <div class="doc-amounts">
+        <div class="doc-amount-ded">${fmt(d.montantDed)} €</div>
+        <div class="doc-amount-brut">brut: ${fmt(d.montantBrut)} €</div>
+      </div>
+      <span style="color:var(--gray);font-size:0.8rem;flex-shrink:0;padding-left:4px">${locked?'👁️':'✏️'}</span>
+    </div>`;
+  }).join('');
+}
+
+// Duplique un document (utile pour frais récurrents : assurance mensuelle, etc.)
+function dupliquerDoc(id){
+  if(!dossierActif) return;
+  if(guardCloture()) return;
+  const doc = getDocs().find(d=>d.id===id);
+  if(!doc) return;
+  const copie = JSON.parse(JSON.stringify(doc));
+  copie.id = 'doc_'+Date.now();
+  copie.date = new Date().toISOString().split('T')[0];
+  delete copie.tickets;
+  getDocs().push(copie);
+  sauvegarderDossiers();
+  renderDocList();
+  showToast('📋 Document dupliqué — modifiez la date/montant si besoin');
+  openEditModal(copie.id);
+}
+
+function deleteDoc(id){
+  if(!dossierActif) return;
+  if(guardCloture()) return;
+  const a = getAnnee();
+  a.documents = a.documents.filter(d=>d.id!==id);
+  sauvegarderDossiers();
+  renderDocList();
+  showToast('🗑 Document supprimé');
+}
+
+// ═══ SOUS-ONGLETS DOCS ═══════════════════════════════════
+let currentSubTab = 'docs';
+
+function showSubTab(tab){
+  currentSubTab = tab;
+  ['docs','restos','carburant'].forEach(t=>{
+    const el = document.getElementById('sub'+t.charAt(0).toUpperCase()+t.slice(1));
+    const btn = document.getElementById('subTab'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(el) el.style.display = t===tab ? 'block' : 'none';
+    if(btn){
+      btn.style.background = t===tab ? 'var(--navy)' : 'none';
+      btn.style.color = t===tab ? 'white' : 'var(--gray)';
+    }
+  });
+  if(tab==='docs') renderDocList();
+  else renderTicketsList(tab==='restos' ? 'repas' : 'carburant');
+}
+
+function renderTicketsList(type){
+  if(!dossierActif) return;
+  const locked = estClôturee();
+  const tickets = getTickets(type);
+  const isRestos = type==='repas';
+  const countEl = document.getElementById(isRestos?'restosCount':'carburantCount');
+  const listEl = document.getElementById(isRestos?'restosList':'carburantList');
+  if(countEl) countEl.textContent = tickets.length;
+  if(!listEl) return;
+  if(!tickets.length){
+    listEl.innerHTML='<div class="empty"><div class="empty-icon">'+(isRestos?'🍽️':'⛽')+'</div><p>Aucun ticket '+(isRestos?'restaurant':'carburant')+'.</p></div>';
+    return;
+  }
+  // Trier par date décroissante
+  const sorted = [...tickets].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const totalBrut = tickets.reduce((s,t)=>s+(t.montant||0),0);
+  const totalDed = tickets.reduce((s,t)=>s+(t.montantDed||0),0);
+  listEl.innerHTML =
+    (locked?'<div class="cloture-banner"><span class="icon">🔒</span><div><strong>Exercice clôturé</strong></div></div>':'')+
+    `<div style="background:var(--light);border-radius:10px;padding:10px 12px;margin-bottom:12px;display:flex;justify-content:space-between;font-size:0.82rem">
+      <div>Total brut : <strong>${fmt(totalBrut)} €</strong></div>
+      <div style="color:var(--green);font-weight:700">Déductible : ${fmt(totalDed)} €</div>
+    </div>`+
+    sorted.map(t=>`
+    <div class="doc-item">
+      <div class="doc-icon" style="background:${isRestos?'#e07b3922':'#1a5fa822'}">${isRestos?'🍽️':'⛽'}</div>
+      <div class="doc-info">
+        <div class="doc-name">${t.ref}</div>
+        <div class="doc-meta">${t.date?new Date(t.date).toLocaleDateString('fr-BE'):''} · ${t.calcul}</div>
+      </div>
+      <div class="doc-amounts">
+        <div class="doc-amount-ded">${fmt(t.montantDed)} €</div>
+        <div class="doc-amount-brut">brut: ${fmt(t.montant)} €</div>
+      </div>
+      ${!locked?`<button onclick="ouvrirEditTicket('${type}','${t.id}')" style="background:none;border:none;color:var(--gray);font-size:1rem;cursor:pointer;padding:4px;flex-shrink:0">✏️</button>`:'<span style="color:var(--gray);font-size:0.8rem;padding-left:4px">👁️</span>'}
+    </div>`).join('')+
+    `<div style="margin-top:12px">
+      <button class="btn-light" onclick="imprimerListingTicketsType('${type}')">🖨️ Imprimer listing ${isRestos?'Restaurants':'Carburant'}</button>
+    </div>`;
+}
+
+// Modal édition ticket individuel
+let editingTicket = null;
+function ouvrirEditTicket(type, id){
+  if(guardCloture()) return;
+  const tickets = getTickets(type);
+  const t = tickets.find(t=>t.id===id);
+  if(!t) return;
+  editingTicket = {type, id};
+  document.getElementById('editTicketRef').value = t.ref||'';
+  document.getElementById('editTicketMontant').value = t.montant||'';
+  document.getElementById('editTicketDate').value = t.date||'';
+  document.getElementById('editTicketModal').classList.add('open');
+}
+
+function sauvegarderEditTicket(){
+  if(!editingTicket) return;
+  const tickets = getTickets(editingTicket.type);
+  const t = tickets.find(t=>t.id===editingTicket.id);
+  if(!t) return;
+  const ref = document.getElementById('editTicketRef').value.trim();
+  const montant = parseFloat(document.getElementById('editTicketMontant').value)||0;
+  const date = document.getElementById('editTicketDate').value;
+  if(!ref){showToast('⚠️ Référence requise');return;}
+  if(!montant){showToast('⚠️ Montant invalide');return;}
+  t.ref = ref;
+  t.montant = montant;
+  t.montantDed = montant * (parseFloat(t.calcul)||6/7);
+  t.date = date;
+  sauvegarderDossiers();
+  document.getElementById('editTicketModal').classList.remove('open');
+  renderTicketsList(editingTicket.type);
+  showToast('✅ Ticket modifié');
+}
+
+function supprimerEditTicket(){
+  if(!editingTicket) return;
+  if(guardCloture()) return;
+  const a = getAnnee();
+  const key = editingTicket.type==='repas' ? 'tickets_repas' : 'tickets_carburant';
+  a[key] = a[key].filter(t=>t.id!==editingTicket.id);
+  sauvegarderDossiers();
+  document.getElementById('editTicketModal').classList.remove('open');
+  renderTicketsList(editingTicket.type);
+  showToast('🗑 Ticket supprimé');
+}
+
+function imprimerListingTicketsType(type){
+  if(!dossierActif) return;
+  const tickets = getTickets(type);
+  if(!tickets.length){showToast('⚠️ Aucun ticket');return;}
+  const isRestos = type==='repas';
+  const label = isRestos?'RESTAURATIONS':'CARBURANT';
+  const now = new Date();
+  const sorted = [...tickets].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const totalBrut = tickets.reduce((s,t)=>s+(t.montant||0),0);
+  const totalDed = tickets.reduce((s,t)=>s+(t.montantDed||0),0);
+  let rows = sorted.map((t,i)=>
+    '<tr><td style="padding:7px 12px;color:#666">'+(i+1)+'</td>'+
+    '<td style="padding:7px 12px">'+t.ref+'</td>'+
+    '<td style="padding:7px 12px;text-align:center;color:#666">'+(t.date?new Date(t.date).toLocaleDateString('fr-BE'):'')+'</td>'+
+    '<td style="padding:7px 12px;text-align:right;font-weight:600">'+fmt(t.montant)+' €</td>'+
+    '<td style="padding:7px 12px;text-align:right;font-weight:700;color:#2d7a4f">'+fmt(t.montantDed)+' €</td></tr>'
+  ).join('');
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>body{font-family:Arial,sans-serif;margin:30px;color:#0f1f3d}h1{font-size:1.2em}table{width:100%;border-collapse:collapse;margin-top:16px}th{padding:8px 12px;text-align:left;border-bottom:2px solid #0f1f3d;font-size:0.82em;color:#666}.total td{padding:10px 12px;font-weight:700;background:#0f1f3d;color:white}tr:nth-child(even){background:#f9f9f9}</style>
+  </head><body>
+  <p style="font-weight:700">${dossierActif.nom} — ${libelleExercice(anneeActiveKey)}</p>
+  <h1>${isRestos?'🍽️':'⛽'} LISTING ${label} — ${tickets.length} ticket(s)</h1>
+  <p style="font-size:0.82em;color:#666">Imprimé le ${now.toLocaleDateString('fr-BE',{day:'numeric',month:'long',year:'numeric'})}</p>
+  <table>
+    <thead><tr><th>#</th><th>Référence</th><th>Date</th><th style="text-align:right">Brut TTC</th><th style="text-align:right">Déductible</th></tr></thead>
+    <tbody>${rows}
+    <tr class="total"><td colspan="3">TOTAL (${tickets.length} tickets)</td><td style="text-align:right;color:#aaa">${fmt(totalBrut)} €</td><td style="text-align:right;color:#e8c97a">${fmt(totalDed)} €</td></tr>
+    </tbody>
+  </table>
+  </body></html>`;
+  ouvrirDocumentExport(html, 'Listing_'+label+'_'+anneeActiveKey+'.html');
+}
+
+
+function openEditModal(id){
+  if(!dossierActif) return;
+  const doc = getDocs().find(d=>d.id===id);
+  if(!doc) return;
+  document.getElementById('editDocId').value = id;
+  document.getElementById('editVolet').value = doc.volet||'frais';
+  updateEditCats();
+  document.getElementById('editCat').value = doc.cat||'frais_divers';
+  document.getElementById('editRef').value = doc.ref||'';
+  document.getElementById('editBrut').value = doc.montantBrut||'';
+  // Trouver le coefficient le plus proche
+  const coeff = doc.montantBrut ? doc.montantDed/doc.montantBrut : 1;
+  const coeffSel = document.getElementById('editCoeff');
+  let bestOpt = '1';
+  let bestDiff = 999;
+  Array.from(coeffSel.options).forEach(o=>{
+    const diff = Math.abs(parseFloat(o.value)-coeff);
+    if(diff<bestDiff){bestDiff=diff;bestOpt=o.value;}
+  });
+  coeffSel.value = bestOpt;
+  document.getElementById('editDate').value = doc.date||new Date().toISOString().split('T')[0];
+  document.getElementById('editNote').value = doc.note||'';
+  updateEditCalc();
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeEditModal(e){
+  if(e && e.target !== document.getElementById('editModal')) return;
+  document.getElementById('editModal').classList.remove('open');
+}
+
+function updateEditCats(){
+  const volet = document.getElementById('editVolet').value;
+  const voletDef = VOLETS[volet]||VOLETS.frais;
+  const sel = document.getElementById('editCat');
+  sel.innerHTML = Object.entries(voletDef.cats).map(([k,v])=>'<option value="'+k+'">'+v.label+'</option>').join('');
+  updateEditCalc();
+}
+
+function updateEditCalc(){
+  const brut = parseFloat(document.getElementById('editBrut').value)||0;
+  const coeff = parseFloat(document.getElementById('editCoeff').value)||1;
+  document.getElementById('editResult').textContent = fmt(brut*coeff)+' € ('+fmtCoeff(coeff)+' de '+fmt(brut)+' €)';
+}
+
+function saveEdit(){
+  if(!dossierActif) return;
+  if(guardCloture()){document.getElementById('editModal').classList.remove('open');return;}
+  const id = document.getElementById('editDocId').value;
+  const doc = getDocs().find(d=>d.id===id);
+  if(!doc) return;
+  const volet = document.getElementById('editVolet').value;
+  const cat = document.getElementById('editCat').value;
+  const brut = parseFloat(document.getElementById('editBrut').value)||0;
+  const coeff = parseFloat(document.getElementById('editCoeff').value)||1;
+  const voletDef = VOLETS[volet]||VOLETS.frais;
+  const catDef = voletDef.cats[cat]||{label:cat,libelle:cat,desc:fmtCoeff(coeff)};
+  doc.volet = volet;
+  doc.cat = cat;
+  doc.ref = document.getElementById('editRef').value.trim()||doc.ref;
+  doc.montantBrut = brut;
+  doc.montantDed = brut*coeff;
+  doc.calcul = fmtCoeff(coeff);
+  doc.libelle = catDef.libelle||'';
+  doc.date = document.getElementById('editDate').value;
+  doc.note = document.getElementById('editNote').value.trim();
+  sauvegarderDossiers();
+  renderDocList();
+  document.getElementById('editModal').classList.remove('open');
+  showToast('✅ Document modifié');
+}
+
+function deleteFromModal(){
+  const id = document.getElementById('editDocId').value;
+  document.getElementById('editModal').classList.remove('open');
+  deleteDoc(id);
+}
+
+// ═══ RECAP ═══════════════════════════════════════════════
+function renderRecap(){
+  if(!dossierActif) return;
+  const locked = estClôturee();
+  document.getElementById('recapNom').textContent = dossierActif.nom;
+  document.getElementById('recapAnnee').textContent = libelleExercice(anneeActiveKey).toUpperCase();
+  document.getElementById('clotureBanner').style.display = locked ? 'flex' : 'none';
+
+  const docs = getDocs();
+  const ticketsRepas = getTickets('repas');
+  const ticketsCarb = getTickets('carburant');
+  // Total global = documents + tickets repas + tickets carburant
+  const totalDed = docs.reduce((s,d)=>s+(d.montantDed||0),0)
+    + ticketsRepas.reduce((s,t)=>s+(t.montantDed||0),0)
+    + ticketsCarb.reduce((s,t)=>s+(t.montantDed||0),0);
+  const totalBrut = docs.reduce((s,d)=>s+(d.montantBrut||0),0)
+    + ticketsRepas.reduce((s,t)=>s+(t.montant||0),0)
+    + ticketsCarb.reduce((s,t)=>s+(t.montant||0),0);
+  document.getElementById('recapTotalDed').textContent = fmt(totalDed)+' €';
+  document.getElementById('recapTotalBrut').textContent = fmt(totalBrut)+' €';
+
+  const el = document.getElementById('voletsList');
+  if(!docs.length && !ticketsRepas.length && !ticketsCarb.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📊</div><p>Aucun document encodé.</p></div>';return;
+  }
+
+  // Synthèse tickets repas et carburant dans le récap
+  let ticketsHtml = '';
+  if(ticketsRepas.length){
+    const tBrut = ticketsRepas.reduce((s,t)=>s+(t.montant||0),0);
+    const tDed = ticketsRepas.reduce((s,t)=>s+(t.montantDed||0),0);
+    ticketsHtml += `<div class="sous-cat"><div class="sous-cat-header"><div>
+      <div class="sous-cat-name">🍽️ Restaurations</div>
+      <div class="sous-cat-libelle">Repas et réceptions professionnels — ${ticketsRepas.length} ticket(s)</div>
+    </div><div class="sous-cat-total">${fmt(tDed)} €</div></div>
+    <div class="sous-cat-item"><span>Total brut</span><span class="sous-cat-item-right"><span style="color:var(--gray)">${fmt(tBrut)} €</span></span></div>
+    <div class="sous-cat-item"><span>Déductible (6/7)</span><span class="sous-cat-item-right"><span class="sous-cat-item-amount">${fmt(tDed)} €</span></span></div>
+    </div>`;
+  }
+  if(ticketsCarb.length){
+    const tBrut = ticketsCarb.reduce((s,t)=>s+(t.montant||0),0);
+    const tDed = ticketsCarb.reduce((s,t)=>s+(t.montantDed||0),0);
+    ticketsHtml += `<div class="sous-cat"><div class="sous-cat-header"><div>
+      <div class="sous-cat-name">⛽ Carburant</div>
+      <div class="sous-cat-libelle">Frais de carburant professionnels — ${ticketsCarb.length} ticket(s)</div>
+    </div><div class="sous-cat-total">${fmt(tDed)} €</div></div>
+    <div class="sous-cat-item"><span>Total brut</span><span class="sous-cat-item-right"><span style="color:var(--gray)">${fmt(tBrut)} €</span></span></div>
+    <div class="sous-cat-item"><span>Déductible (6/7×75%)</span><span class="sous-cat-item-right"><span class="sous-cat-item-amount">${fmt(tDed)} €</span></span></div>
+    </div>`;
+  }
+
+  let html = '';
+  Object.entries(VOLETS).forEach(([voletKey, voletDef])=>{
+    const voletDocs = docs.filter(d=>d.volet===voletKey);
+    if(!voletDocs.length) return;
+
+    const voletDed = voletDocs.reduce((s,d)=>s+(d.montantDed||0),0);
+    const voletBrut = voletDocs.reduce((s,d)=>s+(d.montantBrut||0),0);
+
+    // Grouper par catégorie
+    const grouped = {};
+    voletDocs.forEach(d=>{
+      if(!grouped[d.cat]) grouped[d.cat]=[];
+      grouped[d.cat].push(d);
+    });
+
+    let catsHtml = '';
+    Object.entries(grouped).forEach(([catKey, catDocs])=>{
+      const catDef = voletDef.cats[catKey]||{label:catKey,libelle:catKey};
+      const catDed = catDocs.reduce((s,d)=>s+(d.montantDed||0),0);
+      const catBrut = catDocs.reduce((s,d)=>s+(d.montantBrut||0),0);
+      catsHtml += `<div class="sous-cat">
+        <div class="sous-cat-header">
+          <div>
+            <div class="sous-cat-name">${catDef.label}</div>
+            <div class="sous-cat-libelle">${catDef.libelle||''}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="sous-cat-total">${fmt(catDed)} €</div>
+            <div style="font-size:0.68rem;color:var(--gray)">brut: ${fmt(catBrut)} €</div>
+          </div>
+        </div>
+        ${catDocs.map(d=>`<div class="sous-cat-item">
+          <span>${d.ref}${d.aiClassified?' 🤖':''}</span>
+          <div class="sous-cat-item-right">
+            <div class="sous-cat-item-amount">${fmt(d.montantDed)} €</div>
+            <div class="sous-cat-item-calc">${fmt(d.montantBrut)} € · ${d.calcul}</div>
+          </div>
+        </div>`).join('')}
+      </div>`;
+    });
+
+    html += `<div class="volet">
+      <div class="volet-header" onclick="toggleVolet('v_${voletKey}')">
+        <div class="volet-title">${voletDef.icon} ${voletDef.label}</div>
+        <div class="volet-totals">
+          <div class="volet-total-ded">${fmt(voletDed)} €</div>
+          <div class="volet-total-brut">brut: ${fmt(voletBrut)} €</div>
+        </div>
+      </div>
+      <div class="volet-body" id="v_${voletKey}">${catsHtml}</div>
+    </div>`;
+  });
+
+  el.innerHTML = html;
+  // Ajouter section tickets si présents
+  if(ticketsHtml){
+    el.innerHTML += `<div class="volet">
+      <div class="volet-header" onclick="toggleVolet('v_tickets')">
+        <div class="volet-title">🧾 Frais de déplacement & repas</div>
+        <div class="volet-totals">
+          <div class="volet-total-ded">${fmt(
+            ticketsRepas.reduce((s,t)=>s+(t.montantDed||0),0)+
+            ticketsCarb.reduce((s,t)=>s+(t.montantDed||0),0)
+          )} €</div>
+        </div>
+      </div>
+      <div class="volet-body" id="v_tickets">${ticketsHtml}</div>
+    </div>`;
+  }
+}
+
+function toggleVolet(id){ document.getElementById(id).classList.toggle('open'); }
+
+// ═══ EXPORT PDF ══════════════════════════════════════════
+// Génère le tableau HTML du récapitulatif (réutilisé par exportPDF et exportDossierComplet)
+function genererTableRecapHTML(docs, nomDossier, annee){
+  const ticketsR = getTickets('repas');
+  const ticketsC = getTickets('carburant');
+  const totalDed = docs.reduce((s,d)=>s+(d.montantDed||0),0)
+    + ticketsR.reduce((s,t)=>s+(t.montantDed||0),0)
+    + ticketsC.reduce((s,t)=>s+(t.montantDed||0),0);
+  const totalBrut = docs.reduce((s,d)=>s+(d.montantBrut||0),0)
+    + ticketsR.reduce((s,t)=>s+(t.montant||0),0)
+    + ticketsC.reduce((s,t)=>s+(t.montant||0),0);
+
+  let sectionsHtml = '';
+  Object.entries(VOLETS).forEach(([voletKey, voletDef])=>{
+    const voletDocs = docs.filter(d=>d.volet===voletKey);
+    if(!voletDocs.length) return;
+    const voletDed = voletDocs.reduce((s,d)=>s+(d.montantDed||0),0);
+    const voletBrut = voletDocs.reduce((s,d)=>s+(d.montantBrut||0),0);
+
+    const grouped = {};
+    voletDocs.forEach(d=>{ if(!grouped[d.cat]) grouped[d.cat]=[]; grouped[d.cat].push(d); });
+
+    let rows = '';
+    Object.entries(grouped).forEach(([catKey, catDocs])=>{
+      const catDef = voletDef.cats[catKey]||{label:catKey,libelle:catKey};
+      const catDed = catDocs.reduce((s,d)=>s+(d.montantDed||0),0);
+      const catBrut = catDocs.reduce((s,d)=>s+(d.montantBrut||0),0);
+      rows += `<tr class="cat-row"><td colspan="2" style="padding:8px 10px;font-weight:700;font-style:italic;color:#1a5fa8">${catDef.label} — ${catDef.libelle||''}</td><td style="padding:8px 10px;text-align:right;color:#888">${fmt(catBrut)}</td><td style="padding:8px 10px;text-align:right;font-weight:700;color:#2d7a4f">${fmt(catDed)}</td></tr>`;
+      catDocs.forEach(d=>{
+        rows += `<tr><td style="padding:5px 10px 5px 20px;font-size:0.82em;color:#666">${d.date?new Date(d.date).toLocaleDateString('fr-BE'):''}</td><td style="padding:5px 10px;font-size:0.82em">— ${d.ref}${d.note?' ('+d.note+')':''}</td><td style="padding:5px 10px;text-align:right;font-size:0.82em;color:#888">${fmt(d.montantBrut)}</td><td style="padding:5px 10px;text-align:right;font-size:0.82em;font-weight:600;color:#2d7a4f">${fmt(d.montantDed)}<br><span style="font-size:0.75em;color:#999">${d.calcul}</span></td></tr>`;
+      });
+    });
+
+    sectionsHtml += `
+      <tr style="background:#0f1f3d"><td colspan="4" style="padding:10px;color:white;font-weight:700;font-size:1em">${voletDef.icon} ${voletDef.label.toUpperCase()}</td></tr>
+      ${rows}
+      <tr style="background:#e8f4e8"><td colspan="2" style="padding:8px 10px;font-weight:700">Sous-total ${voletDef.label}</td><td style="padding:8px 10px;text-align:right;color:#888;font-weight:700">${fmt(voletBrut)}</td><td style="padding:8px 10px;text-align:right;font-weight:700;color:#2d7a4f">${fmt(voletDed)}</td></tr>
+      <tr><td colspan="4" style="padding:6px"></td></tr>`;
+  });
+
+  // Ajouter ligne synthèse tickets restos + carburant
+  if(ticketsR.length){
+    const tBrut=ticketsR.reduce((s,t)=>s+(t.montant||0),0), tDed=ticketsR.reduce((s,t)=>s+(t.montantDed||0),0);
+    sectionsHtml += `<tr style="background:#0f1f3d"><td colspan="4" style="padding:10px;color:white;font-weight:700">🍽️ RESTAURATIONS — ${ticketsR.length} ticket(s)</td></tr>
+    <tr style="background:#e8f4e8"><td colspan="2" style="padding:8px 10px;font-weight:700">Total Restaurations</td><td style="padding:8px 10px;text-align:right;color:#888;font-weight:700">${fmt(tBrut)}</td><td style="padding:8px 10px;text-align:right;font-weight:700;color:#2d7a4f">${fmt(tDed)}</td></tr>
+    <tr><td colspan="4" style="padding:6px"></td></tr>`;
+  }
+  if(ticketsC.length){
+    const tBrut=ticketsC.reduce((s,t)=>s+(t.montant||0),0), tDed=ticketsC.reduce((s,t)=>s+(t.montantDed||0),0);
+    sectionsHtml += `<tr style="background:#0f1f3d"><td colspan="4" style="padding:10px;color:white;font-weight:700">⛽ CARBURANT — ${ticketsC.length} ticket(s)</td></tr>
+    <tr style="background:#e8f4e8"><td colspan="2" style="padding:8px 10px;font-weight:700">Total Carburant</td><td style="padding:8px 10px;text-align:right;color:#888;font-weight:700">${fmt(tBrut)}</td><td style="padding:8px 10px;text-align:right;font-weight:700;color:#2d7a4f">${fmt(tDed)}</td></tr>
+    <tr><td colspan="4" style="padding:6px"></td></tr>`;
+  }
+
+  return `<table>
+    <thead><tr>
+      <th style="text-align:left">Date</th>
+      <th style="text-align:left">Document / Référence</th>
+      <th>Montant brut</th>
+      <th>Montant déductible</th>
+    </tr></thead>
+    <tbody>
+      ${sectionsHtml}
+      <tr class="total-row">
+        <td colspan="2">TOTAL GÉNÉRAL — ${nomDossier}</td>
+        <td style="text-align:right;color:#aaa">${fmt(totalBrut)} €</td>
+        <td style="text-align:right;color:#e8c97a">${fmt(totalDed)} €</td>
+      </tr>
+    </tbody>
+  </table>`;
+}
+
+function exportPDF(){
+  if(!dossierActif) return;
+  const now = new Date();
+  const docs = getDocs();
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body{font-family:Arial,sans-serif;margin:30px;color:#0f1f3d;font-size:13px}
+    h1{font-size:1.3em;margin-bottom:4px}
+    .sub{font-size:0.82em;color:#666;margin-bottom:4px}
+    table{width:100%;border-collapse:collapse;margin-top:16px}
+    th{padding:8px 10px;text-align:right;font-size:0.78em;color:#666;border-bottom:2px solid #0f1f3d;background:#f5f5f5}
+    th:first-child,th:nth-child(2){text-align:left}
+    .total-row td{padding:12px 10px;font-size:1em;font-weight:700;background:#0f1f3d;color:white}
+    .sign{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:40px}
+    .sign-box{border-top:1px solid #ccc;padding-top:8px;font-size:0.8em;color:#666}
+  </style></head><body>
+  <p style="font-weight:700;font-size:1.1em">${dossierActif.nom}</p>
+  <h1>RÉCAPITULATIF FISCAL — ${libelleExercice(anneeActiveKey).toUpperCase()}</h1>
+  <p class="sub">Administrateur indépendant — Déclaration IPP Belgique</p>
+  <p class="sub">Document généré le ${now.toLocaleDateString('fr-BE',{day:'numeric',month:'long',year:'numeric'})}</p>
+  ${genererTableRecapHTML(docs, dossierActif.nom, anneeActiveKey)}
+  <div class="sign">
+    <div class="sign-box">Date: _______________<br><br>Signature: _______________</div>
+    <div class="sign-box">Visa comptable: _______________<br><br>Date: _______________</div>
+  </div>
+  </body></html>`;
+
+  ouvrirDocumentExport(html, 'Recap_'+dossierActif.nom.replace(/\s/g,'_')+'_'+anneeActiveKey+'.html');
+}
+
+function exportTicketsRestosCarburant(type){
+  if(!dossierActif) return;
+  const now = new Date();
+  const tickets = getTickets(type);
+  const icon = type==='repas' ? '🍽️' : '⛽';
+  const titre = type==='repas' ? 'RESTAURATIONS' : 'CARBURANT';
+
+  if(!tickets.length){showToast('⚠️ Aucun ticket '+titre.toLowerCase());return;}
+
+  const sorted = [...tickets].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const totalBrut = tickets.reduce((s,t)=>s+(t.montant||0),0);
+  const totalDed = tickets.reduce((s,t)=>s+(t.montantDed||0),0);
+
+  let photosGrid = '';
+  const avecPhoto = sorted.filter(t=>t.photo);
+  if(avecPhoto.length){
+    photosGrid = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px">'+
+      avecPhoto.map(t=>`<div style="border:1px solid #ddd;border-radius:8px;padding:8px;page-break-inside:avoid">
+        <div style="font-size:0.78em;font-weight:700;margin-bottom:2px">${icon} ${t.ref}</div>
+        <div style="font-size:0.72em;color:#666;margin-bottom:6px">${t.date?new Date(t.date).toLocaleDateString('fr-BE'):''} · Brut: ${fmt(t.montant)} €</div>
+        <img src="${t.photo}" style="width:100%;border-radius:4px;border:1px solid #eee">
+      </div>`).join('')+'</div>';
+  }
+
+  let rows = sorted.map((t,i)=>
+    '<tr><td style="padding:6px 10px;color:#666">'+(i+1)+'</td>'+
+    '<td style="padding:6px 10px">'+t.ref+'</td>'+
+    '<td style="padding:6px 10px;text-align:center;color:#666">'+(t.date?new Date(t.date).toLocaleDateString('fr-BE'):'')+'</td>'+
+    '<td style="padding:6px 10px;text-align:right">'+fmt(t.montant)+' €</td>'+
+    '<td style="padding:6px 10px;text-align:right;font-weight:700;color:#2d7a4f">'+fmt(t.montantDed)+' €</td></tr>'
+  ).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>body{font-family:Arial,sans-serif;margin:30px;color:#0f1f3d;font-size:13px}h1{font-size:1.3em;margin-bottom:4px}.sub{font-size:0.82em;color:#666;margin-bottom:4px}table{width:100%;border-collapse:collapse;margin-top:16px}th{padding:8px 10px;text-align:left;border-bottom:2px solid #0f1f3d;font-size:0.78em;color:#666}.total-row td{padding:12px 10px;font-weight:700;background:#0f1f3d;color:white}tr:nth-child(even){background:#f9f9f9}</style>
+  </head><body>
+  <p style="font-weight:700;font-size:1.1em">${dossierActif.nom}</p>
+  <h1>${icon} COPIES TICKETS — ${titre}</h1>
+  <p class="sub">${libelleExercice(anneeActiveKey)} — ${tickets.length} ticket(s)</p>
+  <p class="sub">Total brut: <strong>${fmt(totalBrut)} €</strong> · Total déductible: <strong>${fmt(totalDed)} €</strong></p>
+  <table>
+    <thead><tr><th>#</th><th>Référence</th><th>Date</th><th style="text-align:right">Brut TTC</th><th style="text-align:right">Déductible</th></tr></thead>
+    <tbody>${rows}
+    <tr class="total-row"><td colspan="3">TOTAL (${tickets.length} tickets)</td><td style="text-align:right;color:#aaa">${fmt(totalBrut)} €</td><td style="text-align:right;color:#e8c97a">${fmt(totalDed)} €</td></tr>
+    </tbody>
+  </table>
+  ${photosGrid}
+  </body></html>`;
+
+  ouvrirDocumentExport(html, 'Tickets_'+titre+'_'+anneeActiveKey+'.html');
+}
+
+function exportDossierComplet(){
+  if(!dossierActif) return;
+  const now = new Date();
+  const docs = getDocs();
+
+  // Collecte des photos de tous les documents, sauf catégories repas/carburant
+  const photos = []; // {ref, date, montant, photo, icon, label}
+  docs.forEach(d=>{
+    if(d.volet==='frais' && (d.cat==='repas' || d.cat==='carburant')) return;
+    if(!d.photo) return;
+    const voletDef = VOLETS[d.volet]||VOLETS.frais;
+    const catDef = voletDef.cats[d.cat]||{label:d.cat};
+    photos.push({ref:d.ref, date:d.date, montant:d.montantBrut, montantDed:d.montantDed, photo:d.photo, icon:voletDef.icon, label:catDef.label});
+  });
+
+  let photosHtml = '';
+  if(photos.length){
+    photosHtml += `<div style="page-break-before:always"></div>
+    <h1 style="font-size:1.2em;margin-top:20px">📎 COPIES DES DOCUMENTS SCANNÉS</h1>
+    <p class="sub">${photos.length} document(s) — Restaurants et Carburant exclus (non joints) — qualité réduite pour archivage</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">`;
+    photos.forEach(p=>{
+      photosHtml += `<div style="border:1px solid #ddd;border-radius:8px;padding:8px;page-break-inside:avoid">
+        <div style="font-size:0.78em;font-weight:700;margin-bottom:2px">${p.icon} ${p.ref}</div>
+        <div style="font-size:0.7em;color:#1a5fa8;margin-bottom:4px">${p.label}</div>
+        <div style="font-size:0.72em;color:#666;margin-bottom:6px">${p.date?new Date(p.date).toLocaleDateString('fr-BE'):''} · Brut: ${fmt(p.montant)} € · Déductible: ${fmt(p.montantDed)} €</div>
+        <img src="${p.photo}" style="width:100%;border-radius:4px;border:1px solid #eee">
+      </div>`;
+    });
+    photosHtml += '</div>';
+  } else {
+    photosHtml = `<div style="page-break-before:always"></div>
+    <h1 style="font-size:1.2em;margin-top:20px">📎 COPIES DES DOCUMENTS SCANNÉS</h1>
+    <p class="sub">Aucun document avec photo enregistrée pour cet exercice (Restaurants/Carburant exclus).</p>`;
+  }
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body{font-family:Arial,sans-serif;margin:30px;color:#0f1f3d;font-size:13px}
+    h1{font-size:1.3em;margin-bottom:4px}
+    .sub{font-size:0.82em;color:#666;margin-bottom:4px}
+    table{width:100%;border-collapse:collapse;margin-top:16px}
+    th{padding:8px 10px;text-align:right;font-size:0.78em;color:#666;border-bottom:2px solid #0f1f3d;background:#f5f5f5}
+    th:first-child,th:nth-child(2){text-align:left}
+    .total-row td{padding:12px 10px;font-size:1em;font-weight:700;background:#0f1f3d;color:white}
+    .sign{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:40px}
+    .sign-box{border-top:1px solid #ccc;padding-top:8px;font-size:0.8em;color:#666}
+  </style></head><body>
+  <p style="font-weight:700;font-size:1.1em">${dossierActif.nom}</p>
+  <h1>RÉCAPITULATIF FISCAL — ${libelleExercice(anneeActiveKey).toUpperCase()}</h1>
+  <p class="sub">Administrateur indépendant — Déclaration IPP Belgique</p>
+  <p class="sub">Document généré le ${now.toLocaleDateString('fr-BE',{day:'numeric',month:'long',year:'numeric'})}${estClôturee()?' · Exercice clôturé 🔒':''}</p>
+  ${genererTableRecapHTML(docs, dossierActif.nom, anneeActiveKey)}
+  <div class="sign">
+    <div class="sign-box">Date: _______________<br><br>Signature: _______________</div>
+    <div class="sign-box">Visa comptable: _______________<br><br>Date: _______________</div>
+  </div>
+  ${photosHtml}
+  </body></html>`;
+
+  ouvrirDocumentExport(html, 'Export_complet_'+dossierActif.nom.replace(/\s/g,'_')+'_'+anneeActiveKey+'.html');
+}
+
+// Comparatif multi-années (toutes les années du dossier actif)
+function exportComparatif(){
+  if(!dossierActif) return;
+  const now = new Date();
+  const annees = Object.keys(dossierActif.annees).sort();
+  if(annees.length<2){showToast('⚠️ Au moins 2 exercices nécessaires pour comparer');return;}
+
+  const rowsMap = {};
+  annees.forEach(a=>{
+    dossierActif.annees[a].documents.forEach(d=>{
+      const key = d.volet+'|'+d.cat;
+      const voletDef = VOLETS[d.volet]||VOLETS.frais;
+      const catDef = voletDef.cats[d.cat]||{label:d.cat,libelle:''};
+      if(!rowsMap[key]) rowsMap[key] = {volet:d.volet, label:catDef.label, libelle:catDef.libelle, icon:voletDef.icon, perYear:{}};
+      if(!rowsMap[key].perYear[a]) rowsMap[key].perYear[a] = {brut:0, ded:0};
+      rowsMap[key].perYear[a].brut += d.montantBrut||0;
+      rowsMap[key].perYear[a].ded += d.montantDed||0;
+    });
+  });
+
+  let rows = '';
+  let currentVolet = null;
+  Object.values(rowsMap).sort((a,b)=>a.volet.localeCompare(b.volet)).forEach(r=>{
+    if(r.volet!==currentVolet){
+      const vd = VOLETS[r.volet];
+      rows += `<tr style="background:#0f1f3d"><td colspan="${annees.length+1}" style="padding:8px;color:white;font-weight:700">${vd.icon} ${vd.label.toUpperCase()}</td></tr>`;
+      currentVolet = r.volet;
+    }
+    rows += `<tr><td style="padding:6px 10px;font-size:0.85em">${r.label}</td>`;
+    annees.forEach(a=>{
+      const v = r.perYear[a];
+      rows += `<td style="padding:6px 10px;text-align:right;font-size:0.85em;font-weight:600;color:#2d7a4f">${v?fmt(v.ded)+' €':'—'}</td>`;
+    });
+    rows += '</tr>';
+  });
+
+  let totRow = '<tr class="total-row"><td style="padding:10px">TOTAL DÉDUCTIBLE</td>';
+  annees.forEach(a=>{
+    const tot = dossierActif.annees[a].documents.reduce((s,d)=>s+(d.montantDed||0),0);
+    totRow += `<td style="padding:10px;text-align:right;color:#e8c97a">${fmt(tot)} €</td>`;
+  });
+  totRow += '</tr>';
+
+  const headerCols = annees.map(a=>`<th style="text-align:right">${a}${dossierActif.annees[a].cloture?' 🔒':''}</th>`).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body{font-family:Arial,sans-serif;margin:30px;color:#0f1f3d;font-size:13px}
+    h1{font-size:1.3em;margin-bottom:4px}
+    .sub{font-size:0.82em;color:#666;margin-bottom:4px}
+    table{width:100%;border-collapse:collapse;margin-top:16px}
+    th{padding:8px 10px;text-align:left;font-size:0.78em;color:#666;border-bottom:2px solid #0f1f3d;background:#f5f5f5}
+    .total-row td{padding:12px 10px;font-size:1em;font-weight:700;background:#0f1f3d;color:white}
+  </style></head><body>
+  <p style="font-weight:700;font-size:1.1em">${dossierActif.nom}</p>
+  <h1>COMPARATIF FISCAL PLURIANNUEL</h1>
+  <p class="sub">Exercices: ${annees.join(', ')} — Document généré le ${now.toLocaleDateString('fr-BE',{day:'numeric',month:'long',year:'numeric'})}</p>
+  <table>
+    <thead><tr><th>Catégorie</th>${headerCols}</tr></thead>
+    <tbody>${rows}${totRow}</tbody>
+  </table>
+  </body></html>`;
+
+  ouvrirDocumentExport(html, 'Comparatif_'+dossierActif.nom.replace(/\s/g,'_')+'.html');
+}
+
+// ═══ SAUVEGARDE GLOBALE ══════════════════════════════════
+// Suppression de dossiers (depuis Config)
+function renderConfigDossiers(){
+  const el = document.getElementById('configDossiersList');
+  if(!el) return;
+  if(!dossiers.length){
+    el.innerHTML = '<p style="font-size:0.78rem;color:var(--gray)">Aucun dossier créé.</p>';
+    return;
+  }
+  el.innerHTML = dossiers.map(d=>{
+    const annees = Object.keys(d.annees).sort().reverse();
+    const total = annees.reduce((s,a)=>s+d.annees[a].documents.reduce((s2,doc)=>s2+(doc.montantDed||0),0),0);
+    const nbDocs = annees.reduce((s,a)=>s+d.annees[a].documents.length,0);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--light)">
+      <div>
+        <div style="font-weight:700;font-size:0.9rem">👤 ${d.nom}</div>
+        <div style="font-size:0.73rem;color:var(--gray)">${annees.length} exercice(s) · ${nbDocs} doc(s) · ${fmt(total)} €</div>
+      </div>
+      <button class="btn-small btn-small-red" onclick="demanderSupprimerDossier('${d.id}')">🗑 Supprimer</button>
+    </div>`;
+  }).join('');
+}
+function exporterApplication(){
+  // Fetch le fichier source depuis GitHub Pages plutôt que capturer le DOM
+  fetch(window.location.href.split('?')[0])
+    .then(r=>r.text())
+    .then(html=>{
+      const blob = new Blob([html], {type:'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'DocFiscalPro_App_'+new Date().toISOString().split('T')[0]+'.html';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('📱 Application téléchargée');
+    })
+    .catch(()=>{
+      // Fallback sur le DOM si fetch échoue
+      try{
+        const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        const blob = new Blob([html], {type:'text/html'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'DocFiscalPro_App_'+new Date().toISOString().split('T')[0]+'.html';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('📱 Application téléchargée (DOM)');
+      }catch(err){ showToast('⚠️ Erreur — réessayez'); }
+    });
+}
+
+function exportTout(){
+  const key = localStorage.getItem('docfiscal_apikey')||'';
+  const data = JSON.stringify({app:'DocFiscalPro', version:2, exporte:new Date().toISOString(), dossiers, apiKey: key, customCats}, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'DocFiscalPro_Sauvegarde_complete_'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  localStorage.setItem('docfiscal_lastbackup', new Date().toISOString());
+  updateBackupBadge();
+  showToast('💾 Sauvegarde complète exportée (clé API incluse)');
+}
+
+function importerTout(e){
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!data.dossiers || !Array.isArray(data.dossiers)) throw new Error('Format invalide');
+      if(!confirm('Ceci va REMPLACER tous les dossiers actuels par ceux de la sauvegarde ('+data.dossiers.length+' dossier(s)). Continuer ?')) return;
+      dossiers = data.dossiers;
+      migrerDossiers();
+      sauvegarderDossiers();
+      // Restaurer catégories personnalisées si présentes
+      if(data.customCats){
+        customCats = data.customCats;
+        sauvegarderCustomCats();
+        fusionnerCustomCats();
+      }
+      // Restaurer la clé API si présente dans la sauvegarde
+      if(data.apiKey && data.apiKey.startsWith('sk-ant-')){
+        apiKey = data.apiKey;
+        localStorage.setItem('docfiscal_apikey', apiKey);
+        document.getElementById('apiKeyInput').value = apiKey;
+        document.getElementById('apiStatus').innerHTML = '<span style="color:var(--green)">✓ Clé API restaurée</span>';
+        document.getElementById('initialMsg').innerHTML = 'IA prête ! Scannez un document.';
+      }
+      dossierActif = null; anneeActiveKey = null;
+      renderDossiers();
+      showToast('✅ Sauvegarde restaurée — '+dossiers.length+' dossier(s)'+(data.apiKey?' + clé API':''));
+    }catch(err){showToast('⚠️ Fichier invalide');}
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function updateBackupBadge(){
+  const badge = document.getElementById('lastBackupBadge');
+  if(!badge) return;
+  const last = localStorage.getItem('docfiscal_lastbackup');
+  if(!last){ badge.textContent = 'Jamais sauvegardé'; badge.style.background='var(--red)'; return; }
+  const days = Math.floor((Date.now()-new Date(last).getTime())/86400000);
+  if(days===0) badge.textContent = "Aujourd'hui";
+  else if(days===1) badge.textContent = 'Hier';
+  else badge.textContent = 'Il y a '+days+' j';
+  badge.style.background = days>14 ? 'var(--red)' : (days>7 ? 'var(--gold)' : 'var(--green)');
+}
+
+// Rappel périodique si pas de sauvegarde depuis >14 jours
+function checkBackupReminder(){
+  const last = localStorage.getItem('docfiscal_lastbackup');
+  const days = last ? Math.floor((Date.now()-new Date(last).getTime())/86400000) : 999;
+  if(days>14 && dossiers.length>0){
+    setTimeout(()=>showToast('💾 Pensez à exporter une sauvegarde (Config) — dernière: '+(last?days+'j':'jamais')), 1500);
+  }
+}
+function exportJSON(){
+  if(!dossierActif) return;
+  // Export l'année active + catégories personnalisées
+  const data = JSON.stringify({
+    nom: dossierActif.nom,
+    annee: anneeActiveKey,
+    documents: getDocs(),
+    cloture: estClôturee(),
+    customCats: customCats
+  }, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'DocFiscal_'+dossierActif.nom.replace(/\s/g,'_')+'_'+anneeActiveKey+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('💾 Sauvegarde exportée');
+}
+
+function importerJSON(e){
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try{
+      const d = JSON.parse(ev.target.result);
+      if(!d.nom) throw new Error('Format invalide');
+      // Format ancien {id,nom,annee,documents:[]} ou nouveau {nom,annee,documents:[],cloture}
+      const nom = d.nom;
+      const annee = d.annee || '2026';
+      const documents = d.documents || [];
+      const cloture = !!d.cloture;
+      // Chercher dossier existant par nom, sinon créer
+      let dossier = dossiers.find(x=>x.nom===nom);
+      if(!dossier){
+        dossier = {id:'dos_'+Date.now(), nom, annees:{}, cree:new Date().toISOString()};
+        dossiers.push(dossier);
+      }
+      if(dossier.annees[annee] && dossier.annees[annee].documents.length){
+        if(!confirm('L\'exercice '+annee+' de '+nom+' contient déjà des documents. Remplacer ?')) return;
+      }
+      dossier.annees[annee] = {documents, cloture};
+      // Restaurer catégories personnalisées si présentes
+      if(d.customCats){
+        Object.entries(d.customCats).forEach(([volet, cats])=>{
+          if(!customCats[volet]) customCats[volet] = {};
+          Object.entries(cats).forEach(([key,def])=>{
+            customCats[volet][key] = def;
+            if(VOLETS[volet]) VOLETS[volet].cats[key] = def;
+          });
+        });
+        sauvegarderCustomCats();
+      }
+      sauvegarderDossiers();
+      renderDossiers();
+      showToast('✅ Importé: '+nom+' — Exercice '+annee);
+    }catch(err){showToast('⚠️ Fichier invalide');}
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function importerCSV(e){
+  const file = e.target.files[0]; if(!file) return;
+  if(!dossierActif){showToast('⚠️ Ouvrez un dossier d\'abord');return;}
+  if(guardCloture()) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const lines = ev.target.result.split('\n').filter(l=>l.trim());
+    let imported = 0;
+    lines.slice(1).forEach(line => {
+      const cols = line.split(';').map(c=>c.trim().replace(/"/g,''));
+      if(cols.length < 3) return;
+      const montant = parseFloat((cols[2]||'0').replace(',','.'))||0;
+      if(!montant) return;
+      getDocs().push({
+        id:'doc_'+Date.now()+Math.random(),
+        volet:'frais', cat:'frais_divers',
+        ref: cols[1]||cols[0]||'Import CSV',
+        montantBrut: montant, montantDed: montant,
+        calcul:'×100%', libelle:'Import CSV',
+        date: cols[0]||new Date().toISOString().split('T')[0],
+        note:'CSV', aiClassified:false
+      });
+      imported++;
+    });
+    sauvegarderDossiers();
+    renderDocList();
+    showToast('✅ '+imported+' lignes importées');
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function envoyerEmail(){
+  if(!dossierActif) return;
+  const docs = getDocs();
+  const totalDed = docs.reduce((s,d)=>s+(d.montantDed||0),0);
+  const subject = encodeURIComponent('Récapitulatif fiscal '+anneeActiveKey+' — '+dossierActif.nom);
+  const body = encodeURIComponent(
+    'Madame, Monsieur,\n\nVeuillez trouver ci-joint le récapitulatif fiscal pour l\'exercice '+anneeActiveKey+'.\n\n'+
+    'Total déductible: '+fmt(totalDed)+' €\n'+
+    'Nombre de documents: '+docs.length+'\n\n'+
+    'Cordialement,\n'+dossierActif.nom
+  );
+  window.location.href = 'mailto:?subject='+subject+'&body='+body;
+}
+
+// ═══ RÈGLES CONFIG ═══════════════════════════════════════
+function renderRules(){
+  const el = document.getElementById('rulesList');
+  const rules = [
+    {icon:'⛽',name:'Carburant',desc:'Total TVAC × 6/7 × 75%',pct:'~48%'},
+    {icon:'🚗',name:'Frais véhicule',desc:'Total TVAC × 6/7 × 75%',pct:'~48%'},
+    {icon:'🍽️',name:'Repas/Restaurants',desc:'Total TVAC × 6/7',pct:'~86%'},
+    {icon:'🎁',name:'Représentation',desc:'Total × 50%',pct:'50%'},
+    {icon:'📱',name:'Téléphone/GSM',desc:'Total × 100%',pct:'100%'},
+    {icon:'🏠',name:'Bureau domicile',desc:'Total × % bureau (défaut 15%)',pct:'15%'},
+    {icon:'🛡️',name:'Assurances',desc:'Prime annuelle × 100%',pct:'100%'},
+    {icon:'📋',name:'Documents officiels',desc:'Montant × 100%',pct:'100%'},
+  ];
+  el.innerHTML = rules.map(r=>`<div class="rule-item">
+    <div class="rule-icon">${r.icon}</div>
+    <div class="rule-info"><div class="rule-name">${r.name}</div><div class="rule-desc">${r.desc}</div></div>
+    <div class="rule-pct">${r.pct}</div>
+  </div>`).join('');
+}
+
+// ═══ HELPERS ════════════════════════════════════════════
+function fmt(n){return(n||0).toLocaleString('fr-BE',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// "Exercice 2026 — revenus 2025"
+function libelleExercice(annee){
+  const a = parseInt(annee);
+  return 'Exercice '+annee+' — revenus '+(a-1);
+}
+
+// Ouvre un document généré (récap, listing...) dans un nouvel onglet avec une barre
+// d'outils permanente : Imprimer/PDF, Télécharger, Fermer — pour éviter le blocage
+// après annulation de l'impression sur iOS.
+function ouvrirDocumentExport(html, filename){
+  const toolbar = `<div class="export-toolbar" style="position:sticky;top:0;background:#0f1f3d;padding:12px;display:flex;gap:10px;z-index:999;font-family:'DM Sans',Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.15)">
+    <button onclick="window.print()" style="flex:1;padding:13px;background:#e8c97a;color:#0f1f3d;border:none;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer">🖨️ Imprimer / Enregistrer en PDF</button>
+    <button onclick="if(!window.close()){history.back()}" style="padding:13px 20px;background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:10px;font-weight:700;font-size:15px;cursor:pointer">← Retour</button>
+  </div>
+  <style>@media print{.export-toolbar{display:none!important}}</style>`;
+
+  // Insère la barre juste après la balise <body...> (avec ou sans attributs)
+  let fullHtml;
+  if(/<body[^>]*>/i.test(html)){
+    fullHtml = html.replace(/<body[^>]*>/i, m=>m+toolbar);
+  } else {
+    fullHtml = toolbar + html;
+  }
+
+  const win = window.open('','_blank');
+  if(!win){ showToast('⚠️ Pop-up bloquée — autorisez les fenêtres pour cette app'); return; }
+  win.document.open();
+  win.document.write(fullHtml);
+  win.document.close();
+}
+
+// Compresse une image (dataURL) en JPEG basse qualité, largeur max 600px
+function compresserImage(dataUrl, maxWidth=600, quality=0.45){
+  return new Promise((resolve)=>{
+    try{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w > maxWidth){ h = Math.round(h * maxWidth / w); w = maxWidth; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = ()=>resolve(null);
+      img.src = dataUrl;
+    }catch(err){ resolve(null); }
+  });
+}
+</script>
+</body>
+</html>
