@@ -180,7 +180,7 @@ input[type="file"]{display:none}
   <div class="header-sub">Déclaration fiscale IPP — Indépendant Belgique</div>
   <div style="display:flex;justify-content:space-between;align-items:center">
     <div class="header-dossier" id="headerDossier">Aucun dossier ouvert</div>
-    <div style="font-size:0.62rem;opacity:0.4;color:white;flex-shrink:0;padding-left:8px">v.68</div>
+    <div style="font-size:0.62rem;opacity:0.4;color:white;flex-shrink:0;padding-left:8px">v.69</div>
   </div>
 </header>
 <nav>
@@ -1628,7 +1628,7 @@ Réponds UNIQUEMENT en JSON:
     const resp = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:600,messages:[{role:'user',content:[
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,messages:[{role:'user',content:[
         contentSource,
         {type:'text',text:prompt}
       ]}]})
